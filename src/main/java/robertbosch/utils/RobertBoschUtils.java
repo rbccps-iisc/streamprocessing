@@ -7,12 +7,14 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeoutException;
 
 import org.bson.Document;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -191,14 +193,14 @@ public class RobertBoschUtils {
 	
 	//need to populate it with template_id and schema json string as key and value
 	public static void establishCatalogueDBConn() {
-		String schema="";
+		String catstring="";
 		try {
 			URL catURL = new URL("http://10.156.14.5:8001/cat");
 			//URL catURL = new URL("http://smartcity.rbccps.org/api/0.1.0/cat");
 			BufferedReader rdr = new BufferedReader(new InputStreamReader(catURL.openStream()));
 			String line;
 			while((line = rdr.readLine()) != null) {
-				schema += line;
+				catstring += line;
 				System.out.println(line);
 			}
 			
@@ -213,9 +215,24 @@ public class RobertBoschUtils {
 		//catalogue map gets populated here
 		JSONParser parse = new JSONParser();
 		try {
-			Object obj = parse.parse(schema);
+			Object obj = parse.parse(catstring);
 			JSONObject jsonobj = (JSONObject)obj;
 			
+			JSONArray items = (JSONArray)jsonobj.get("items");
+			Iterator<JSONObject> itr = items.iterator();
+			while(itr.hasNext()) {
+				JSONObject itemobj = itr.next();
+				String href = itemobj.get("href").toString();
+				System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ href:" + href);
+				JSONArray itemMetaArr = (JSONArray)itemobj.get("item-metadata");
+				Iterator<JSONObject> it = itemMetaArr.iterator();
+				while(it.hasNext()) {
+					JSONObject metaobj = it.next();
+					String schema = metaobj.get("data_schema").toString();
+					System.out.println("######################### schema:" + schema);
+				}
+				
+			}
 			
 		} catch(ParseException pex) {
 			pex.printStackTrace();
