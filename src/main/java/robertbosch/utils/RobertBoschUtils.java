@@ -13,6 +13,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeoutException;
 
 import org.bson.Document;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jackson.JsonLoader;
@@ -191,6 +194,7 @@ public class RobertBoschUtils {
 		String schema="";
 		try {
 			URL catURL = new URL("http://10.156.14.5:8001/cat");
+			//URL catURL = new URL("http://smartcity.rbccps.org/api/0.1.0/cat");
 			BufferedReader rdr = new BufferedReader(new InputStreamReader(catURL.openStream()));
 			String line;
 			while((line = rdr.readLine()) != null) {
@@ -207,8 +211,15 @@ public class RobertBoschUtils {
 		}
 		
 		//catalogue map gets populated here
-		
-		
+		JSONParser parse = new JSONParser();
+		try {
+			Object obj = parse.parse(schema);
+			JSONObject jsonobj = (JSONObject)obj;
+			
+			
+		} catch(ParseException pex) {
+			pex.printStackTrace();
+		}
 		
 	}
 }

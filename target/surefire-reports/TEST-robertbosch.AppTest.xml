@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="1" failures="0" name="robertbosch.AppTest" time="0.003" errors="0" skipped="0">
+<testsuite tests="1" failures="0" name="robertbosch.AppTest" time="0.014" errors="0" skipped="0">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="sun.boot.library.path" value="C:\Java\jdk1.8.0_77\jre\bin"/>
     <property name="java.vm.version" value="25.77-b03"/>
     <property name="java.vm.vendor" value="Oracle Corporation"/>
-    <property name="maven.multiModuleProjectDirectory" value="C:\Users\Sahil Tyagi\Documents\IISc\robertbosch"/>
+    <property name="maven.multiModuleProjectDirectory" value="C:\Users\Sahil Tyagi\Documents\IISc\RBCCPS\streamprocessing"/>
     <property name="java.vendor.url" value="http://java.oracle.com/"/>
     <property name="path.separator" value=";"/>
     <property name="guice.disable.misplaced.annotation.check" value="true"/>
@@ -16,7 +16,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="sun.os.patch.level" value=""/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
-    <property name="user.dir" value="C:\Users\Sahil Tyagi\Documents\IISc\robertbosch"/>
+    <property name="user.dir" value="C:\Users\Sahil Tyagi\Documents\IISc\RBCCPS\streamprocessing"/>
     <property name="java.runtime.version" value="1.8.0_77-b03"/>
     <property name="java.awt.graphicsenv" value="sun.awt.Win32GraphicsEnvironment"/>
     <property name="java.endorsed.dirs" value="C:\Java\jdk1.8.0_77\jre\lib\endorsed"/>
@@ -63,5 +63,5 @@
     <property name="sun.desktop" value="windows"/>
     <property name="sun.cpu.isalist" value="amd64"/>
   </properties>
-  <testcase classname="robertbosch.AppTest" name="testApp" time="0.003"/>
+  <testcase classname="robertbosch.AppTest" name="testApp" time="0.014"/>
 </testsuite>
