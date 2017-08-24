@@ -40,7 +40,7 @@ public class SchemaBrokerSpout extends BaseRichSpout {
 		// TODO Auto-generated method stub
 		this.spoutcollector = collector;
 		nbqueue = new ConcurrentLinkedQueue<byte[]>();
-		RobertBoschUtils.subscribeToSensorData("**queue name for sensor data broker**");
+		RobertBoschUtils.subscribeToSensorData();
 		
 		//establish database connection to device catalogue...will return a hashmap for datatype key and schema value (streetlight, streetlight schema etc)
 		RobertBoschUtils.establishCatalogueDBConn();

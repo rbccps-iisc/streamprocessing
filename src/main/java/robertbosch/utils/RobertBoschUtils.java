@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeoutException;
@@ -36,53 +37,23 @@ import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
+import robertbosch.schema.validation.SchemaBrokerSpout;
+
 public class RobertBoschUtils {
-//	public static String brokerhost = "10.156.14.9";
-//	public static int brokerPort = 5672;
-//	public static String brokerUsername = "rbccps";
-//	public static String brokerPassword = "rbccps@123";
-//	public static String brokerVHost = "rbccps_vhost";
-//	public static String EXCHANGE_NAME = "rbccps_iot";
-//	public static String bindingKey = "*.#";
+	public static Properties props = new Properties();
 	public static ConcurrentHashMap<String, String> catalogue = new ConcurrentHashMap<String, String>();
 	
-	public static String brokerhost = "localhost";
-	public static int brokerPort = 5672;
-	
-	public static void main(String[] args) throws IOException {
-//		ConnectionFactory factory = new ConnectionFactory();
-//		factory.setHost(brokerhost);
-//		factory.setPort(brokerPort);
-//		try {
-//			Connection conn = factory.newConnection();
-//			//subscribeToBroker("t2");
-//			publishToBroker("t1");
-//			
-//		} catch(IOException e) {
-//			e.printStackTrace();
-//		} catch(TimeoutException timeout) {
-//			timeout.printStackTrace();
-//		}
+	static {
 		
-//		BufferedReader rdr = new BufferedReader(new InputStreamReader(new FileInputStream("C:/Users/Sahil Tyagi/Desktop/ad hoc data/schema.json")));
-//		String str=null;
-//		StringBuilder schemabuilder = new StringBuilder();
-//		while((str=rdr.readLine()) != null) {
-//			schemabuilder.append(str);
-//		}
-//		rdr.close();
-//		
-//		String data = "{\"caseTemperature\": 33,\"powerConsumption\": 145,\"ambientLux\": 10,\"targetPowerState\": \"ON\",\"targetControlPolicy\": \"AUTO_TIMER\","
-//				+ "\"targetAutoTimerParams\": { \"targetOnTime\": 343434, \"targetOffTime\": 6767676}}";
-//		
-//		boolean val = validateSchema(schemabuilder.toString(), data);
-//		if(val) {
-//			System.out.println("yes");
-//		} else {
-//			System.out.println("no");
-//		}
-		
-		establishCatalogueDBConn();
+		props.setProperty("host", "10.156.14.9");
+		props.setProperty("port", "5672");
+		props.setProperty("username", "rbccps");
+		props.setProperty("password", "rbccps@123");
+		props.setProperty("exchange", "amq.topic");
+		props.setProperty("bindingkey", "*.#");
+		props.setProperty("virtualhost", "/");
+		props.setProperty("queuename", "database_queue");
+		props.setProperty("catalogue", "http://10.156.14.5:8001/cat");
 		
 	}
 	
@@ -109,8 +80,8 @@ public class RobertBoschUtils {
 	public static void subscribeToBroker(String topic) {
 		try {
 			ConnectionFactory factory = new ConnectionFactory();
-			factory.setHost(brokerhost);
-			factory.setPort(brokerPort);
+			factory.setHost(props.getProperty("host"));
+			factory.setPort(Integer.parseInt(props.getProperty("port")));
 			
 			Connection conn = factory.newConnection();
 			Channel channel = conn.createChannel();
@@ -136,25 +107,30 @@ public class RobertBoschUtils {
 	
 	}
 	
-	public static void subscribeToSensorData(String topic) {
+	public static void subscribeToSensorData() {
 		try {
 			ConnectionFactory factory = new ConnectionFactory();
-			factory.setHost(brokerhost);
-			factory.setPort(brokerPort);
+			factory.setHost(props.getProperty("host"));
+			factory.setPort(Integer.parseInt(props.getProperty("port")));
+			factory.setUsername(props.getProperty("username"));
+			factory.setPassword(props.getProperty("password"));
+			factory.setVirtualHost(props.getProperty("virtualhost"));
 			
 			Connection conn = factory.newConnection();
 			Channel channel = conn.createChannel();
-			channel.queueDeclare(topic, false, false, false, null);
+			channel.exchangeDeclare(props.getProperty("exchange"), "topic", true);
 			
 			Consumer consumer = new DefaultConsumer(channel) {
 				public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-					//com.robert.bosch.schema.validation.SchemaBrokerSpout.nbqueue.add(body);
+					SchemaBrokerSpout.nbqueue.add(body);
 					String message = new String(body, "UTF-8");
 				    System.out.println(" [x] Received '" + message + "'");
 				}  
 			};
 			
-			channel.basicConsume(topic, true, consumer);
+			channel.queueDeclare(props.getProperty("queuename"), true, false, false, null);
+			channel.queueBind(props.getProperty("queuename"), props.getProperty("exchange"), props.getProperty("bindingkey"));
+			channel.basicConsume(props.getProperty("queuename"), true, consumer);
 			
 		} catch(IOException e) {
 			e.printStackTrace();
@@ -167,8 +143,8 @@ public class RobertBoschUtils {
 	public static void publishToBroker(String topic) {
 		try {
 			ConnectionFactory factory = new ConnectionFactory();
-			factory.setHost(brokerhost);
-			factory.setPort(brokerPort);
+			factory.setHost(props.getProperty("host"));
+			factory.setPort(Integer.parseInt(props.getProperty("port")));
 			
 			Connection conn = factory.newConnection();
 			Channel channel = conn.createChannel();
@@ -195,16 +171,13 @@ public class RobertBoschUtils {
 	public static void establishCatalogueDBConn() {
 		String catstring="";
 		try {
-			URL catURL = new URL("http://10.156.14.5:8001/cat");
-			//URL catURL = new URL("http://smartcity.rbccps.org/api/0.1.0/cat");
+			URL catURL = new URL(props.getProperty("catalogue"));
 			BufferedReader rdr = new BufferedReader(new InputStreamReader(catURL.openStream()));
 			String line;
 			while((line = rdr.readLine()) != null) {
 				catstring += line;
-				System.out.println(line);
 			}
 			
-			//System.out.println(schema);
 			rdr.close();
 		} catch(MalformedURLException malurl) {
 			malurl.printStackTrace();
@@ -223,20 +196,23 @@ public class RobertBoschUtils {
 			while(itr.hasNext()) {
 				JSONObject itemobj = itr.next();
 				String href = itemobj.get("href").toString();
-				System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ href:" + href);
 				JSONArray itemMetaArr = (JSONArray)itemobj.get("item-metadata");
 				Iterator<JSONObject> it = itemMetaArr.iterator();
 				while(it.hasNext()) {
 					JSONObject metaobj = it.next();
 					String schema = metaobj.get("data_schema").toString();
-					System.out.println("######################### schema:" + schema);
+					catalogue.put(href, schema);
 				}
-				
 			}
 			
 		} catch(ParseException pex) {
 			pex.printStackTrace();
 		}
-		
 	}
+	
+	public static void main(String[] args) throws IOException {
+		//establishCatalogueDBConn();
+		subscribeToSensorData();
+	}
+	
 }

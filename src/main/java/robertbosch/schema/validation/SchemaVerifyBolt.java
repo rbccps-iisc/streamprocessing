@@ -26,7 +26,7 @@ public class SchemaVerifyBolt extends BaseRichBolt {
 		String sensordata = tuple.getStringByField("sensordata");
 		boolean status=false;
 		
-		//json parser here
+		//json parser here for incoming data packet read from non-blocking queue
 		
 		//get appropriate schema from hashmap and call method validateSchema to get boolean result. If true, data is valid else discard it
 		//fetch type of data (energy meter, street light etc.) from json 'sensordata', and this will be key of the map
@@ -48,6 +48,7 @@ public class SchemaVerifyBolt extends BaseRichBolt {
 	public void prepare(Map map, TopologyContext context, OutputCollector collector) {
 		// TODO Auto-generated method stub
 		this.collector = collector;
+		RobertBoschUtils utils = new RobertBoschUtils();
 	}
 
 	public void declareOutputFields(OutputFieldsDeclarer fields) {
