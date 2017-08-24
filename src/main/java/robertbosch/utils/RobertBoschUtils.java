@@ -110,15 +110,22 @@ public class RobertBoschUtils {
 	public static void subscribeToSensorData() {
 		try {
 			ConnectionFactory factory = new ConnectionFactory();
-			factory.setHost(props.getProperty("host"));
-			factory.setPort(Integer.parseInt(props.getProperty("port")));
-			factory.setUsername(props.getProperty("username"));
-			factory.setPassword(props.getProperty("password"));
-			factory.setVirtualHost(props.getProperty("virtualhost"));
+//			factory.setHost(props.getProperty("host"));
+//			factory.setPort(Integer.parseInt(props.getProperty("port")));
+//			factory.setUsername(props.getProperty("username"));
+//			factory.setPassword(props.getProperty("password"));
+//			factory.setVirtualHost(props.getProperty("virtualhost"));
+			
+			factory.setHost("10.156.14.9");
+			factory.setPort(5672);
+			factory.setUsername("rbccps");
+			factory.setPassword("rbccps@123");
+			factory.setVirtualHost("/");
 			
 			Connection conn = factory.newConnection();
 			Channel channel = conn.createChannel();
-			channel.exchangeDeclare(props.getProperty("exchange"), "topic", true);
+			//channel.exchangeDeclare(props.getProperty("exchange"), "topic", true);
+			channel.exchangeDeclare("amq.topic", "topic", true);
 			
 			Consumer consumer = new DefaultConsumer(channel) {
 				public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
@@ -128,9 +135,13 @@ public class RobertBoschUtils {
 				}  
 			};
 			
-			channel.queueDeclare(props.getProperty("queuename"), true, false, false, null);
-			channel.queueBind(props.getProperty("queuename"), props.getProperty("exchange"), props.getProperty("bindingkey"));
-			channel.basicConsume(props.getProperty("queuename"), true, consumer);
+//			channel.queueDeclare(props.getProperty("queuename"), true, false, false, null);
+//			channel.queueBind(props.getProperty("queuename"), props.getProperty("exchange"), props.getProperty("bindingkey"));
+//			channel.basicConsume(props.getProperty("queuename"), true, consumer);
+			
+			channel.queueDeclare("database_queue", true, false, false, null);
+			channel.queueBind("database_queue", "amq.topic", "*.#");
+			channel.basicConsume("database_queue", true, consumer);
 			
 		} catch(IOException e) {
 			e.printStackTrace();
