@@ -31,12 +31,7 @@ public class SchemaVerifyBolt extends BaseRichBolt {
 		//get appropriate schema from hashmap and call method validateSchema to get boolean result. If true, data is valid else discard it
 		//fetch type of data (energy meter, street light etc.) from json sensor data, and this will be key of the hash
 		
-		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% size: " + RobertBoschUtils.catalogue);
-//		for(Map.Entry<String, String> entry : RobertBoschUtils.catalogue.entrySet()) {
-//			System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-//			System.out.println(entry.getKey() + " %%%%%%%%%%%%% " + entry.getValue());
-//		}
-		
+		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% size: " + RobertBoschUtils.catalogue.size());
 		if(!RobertBoschUtils.catalogue.containsKey("RBCCPS_EM_1111")) {
 			//establish database conn and fill the hashmap again
 			RobertBoschUtils.establishCatalogueDBConn();
@@ -45,6 +40,7 @@ public class SchemaVerifyBolt extends BaseRichBolt {
 			status = RobertBoschUtils.validateSchema(RobertBoschUtils.catalogue.get("RBCCPS_EM_1111"), sensordata);
 		}
 		
+		System.out.println("############################################ val of status: " + status);
 		if(status) {
 			//collector.emit(new Values(sensordata));
 			//publish to rabbitmq
