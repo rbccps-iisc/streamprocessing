@@ -1,5 +1,6 @@
 package robertbosch.schema.validation;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -27,9 +28,8 @@ public class SchemaVerifyBolt extends BaseRichBolt {
 		boolean status=false;
 		
 		//json parser here for incoming data packet read from non-blocking queue
-		
 		//get appropriate schema from hashmap and call method validateSchema to get boolean result. If true, data is valid else discard it
-		//fetch type of data (energy meter, street light etc.) from json 'sensordata', and this will be key of the map
+		//fetch type of data (energy meter, street light etc.) from json sensor data, and this will be key of the hash
 		
 		if(!RobertBoschUtils.catalogue.containsKey("*from sensor data*")) {
 			//establish database conn and fill the hashmap again
@@ -40,7 +40,13 @@ public class SchemaVerifyBolt extends BaseRichBolt {
 		}
 		
 		if(status) {
-			collector.emit(new Values(sensordata));
+			//collector.emit(new Values(sensordata));
+			try {
+				RobertBoschUtils.publishchannel.basicPublish("", "validation", null, sensordata.getBytes());
+				System.out.println("##########################3 successfully validated and published data...................");
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
 		}
 		
 	}

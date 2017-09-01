@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,10 +44,12 @@ import robertbosch.schema.validation.SchemaBrokerSpout;
 public class RobertBoschUtils {
 	public static Properties props = new Properties();
 	public static ConcurrentHashMap<String, String> catalogue = new ConcurrentHashMap<String, String>();
+	private static List<String> list;
+	public static Channel publishchannel;
 	
 	static {
 		
-		props.setProperty("host", "10.156.14.9");
+		props.setProperty("host", "10.156.14.6");
 		props.setProperty("port", "5672");
 		props.setProperty("username", "rbccps");
 		props.setProperty("password", "rbccps@123");
@@ -77,6 +81,7 @@ public class RobertBoschUtils {
 		return status;
 	}
 	
+	//local function
 	public static void subscribeToBroker(String topic) {
 		try {
 			ConnectionFactory factory = new ConnectionFactory();
@@ -98,7 +103,6 @@ public class RobertBoschUtils {
 			};
 			
 			channel.basicConsume(topic, true, consumer);
-			
 		} catch(IOException e) {
 			e.printStackTrace();
 		} catch(TimeoutException t) {
@@ -110,38 +114,31 @@ public class RobertBoschUtils {
 	public static void subscribeToSensorData() {
 		try {
 			ConnectionFactory factory = new ConnectionFactory();
-//			factory.setHost(props.getProperty("host"));
-//			factory.setPort(Integer.parseInt(props.getProperty("port")));
-//			factory.setUsername(props.getProperty("username"));
-//			factory.setPassword(props.getProperty("password"));
-//			factory.setVirtualHost(props.getProperty("virtualhost"));
-			
-			factory.setHost("10.156.14.9");
-			factory.setPort(5672);
-			factory.setUsername("rbccps");
-			factory.setPassword("rbccps@123");
-			factory.setVirtualHost("/");
-			
+			factory.setHost(props.getProperty("host"));
+			factory.setPort(Integer.parseInt(props.getProperty("port")));
+			factory.setUsername(props.getProperty("username"));
+			factory.setPassword(props.getProperty("password"));
+			factory.setVirtualHost(props.getProperty("virtualhost"));
+
 			Connection conn = factory.newConnection();
 			Channel channel = conn.createChannel();
-			//channel.exchangeDeclare(props.getProperty("exchange"), "topic", true);
-			channel.exchangeDeclare("amq.topic", "topic", true);
+			channel.exchangeDeclare(props.getProperty("exchange"), "topic", true);
 			
+			System.out.println("going to subscribe...");
 			Consumer consumer = new DefaultConsumer(channel) {
 				public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-					SchemaBrokerSpout.nbqueue.add(body);
-					String message = new String(body, "UTF-8");
-				    System.out.println(" [x] Received '" + message + "'");
+					if(body != null) {
+						SchemaBrokerSpout.nbqueue.add(body);
+						String message = new String(body, "UTF-8");
+						//list.add(message);
+					    System.out.println(" [x] Received '" + message + "'");
+					}
 				}  
 			};
 			
-//			channel.queueDeclare(props.getProperty("queuename"), true, false, false, null);
-//			channel.queueBind(props.getProperty("queuename"), props.getProperty("exchange"), props.getProperty("bindingkey"));
-//			channel.basicConsume(props.getProperty("queuename"), true, consumer);
-			
-			channel.queueDeclare("database_queue", true, false, false, null);
-			channel.queueBind("database_queue", "amq.topic", "*.#");
-			channel.basicConsume("database_queue", true, consumer);
+			channel.queueDeclare(props.getProperty("queuename"), true, false, false, null);
+			channel.queueBind(props.getProperty("queuename"), props.getProperty("exchange"), props.getProperty("bindingkey"));
+			channel.basicConsume(props.getProperty("queuename"), true, consumer);
 			
 		} catch(IOException e) {
 			e.printStackTrace();
@@ -150,7 +147,7 @@ public class RobertBoschUtils {
 		}
 	}	
 	
-	//sample method
+	//local function
 	public static void publishToBroker(String topic) {
 		try {
 			ConnectionFactory factory = new ConnectionFactory();
@@ -175,6 +172,23 @@ public class RobertBoschUtils {
 			timeout.printStackTrace();
 		}
 		
+	}
+	
+	public static void publishFileteredData() {
+		try {
+			ConnectionFactory factory = new ConnectionFactory();
+			factory.setHost(props.getProperty("host"));
+			factory.setPort(Integer.parseInt(props.getProperty("port")));
+			
+			Connection conn = factory.newConnection();
+			publishchannel = conn.createChannel();
+			publishchannel.queueDeclare("validation", false, false, false, null);
+			
+		} catch(IOException e) {
+			e.printStackTrace();
+		} catch(TimeoutException timeout) {
+			timeout.printStackTrace();
+		}
 	}
 	
 	
@@ -221,9 +235,31 @@ public class RobertBoschUtils {
 		}
 	}
 	
-	public static void main(String[] args) throws IOException {
-		//establishCatalogueDBConn();
+	private static void checkValidation() {
+		list = new ArrayList<String>();
 		subscribeToSensorData();
+		while(true) {
+			if(list.size() > 0) {
+				int index=0;
+				while(index < list.size()) {
+					//RBCCPS_EM_1111
+					boolean status = validateSchema(catalogue.get("RBCCPS_EM_1111"), list.get(index));
+					if(status) {
+						System.out.println("Voila! It's a match for: " + list.get(index));
+					} else {
+						System.out.println("not a match for: " + list.get(index));
+					}
+					
+					index++;
+				}
+				System.out.println("xxxxxxxxxxxxxxxxxxxxx");
+			}
+		}
+	}
+	
+	public static void main(String[] args) throws IOException {
+		establishCatalogueDBConn();
+		checkValidation();
 	}
 	
 }
