@@ -131,7 +131,7 @@ public class RobertBoschUtils {
 						SchemaBrokerSpout.nbqueue.add(body);
 						String message = new String(body, "UTF-8");
 						//list.add(message);
-					    System.out.println(" [x] Received '" + message + "'");
+					   // System.out.println(" [x] Received '" + message + "'");
 					}
 				}  
 			};
@@ -252,7 +252,6 @@ public class RobertBoschUtils {
 					
 					index++;
 				}
-				System.out.println("xxxxxxxxxxxxxxxxxxxxx");
 			}
 		}
 	}
