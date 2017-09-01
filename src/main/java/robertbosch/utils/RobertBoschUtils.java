@@ -257,8 +257,7 @@ public class RobertBoschUtils {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		establishCatalogueDBConn();
-		checkValidation();
+		subscribeToBroker("validation");
 	}
 	
 }
