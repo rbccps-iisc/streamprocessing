@@ -257,6 +257,7 @@ public class RobertBoschUtils {
 	}
 	
 	public static void main(String[] args) throws IOException {
+		System.out.println("starting...");
 		subscribeToBroker("validation");
 	}
 	
