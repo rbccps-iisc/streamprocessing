@@ -44,7 +44,7 @@ public class SchemaVerifyBolt extends BaseRichBolt {
 		if(status) {
 			//collector.emit(new Values(sensordata));
 			//publish to rabbitmq
-			System.out.println("^^^^^^^^^^^^^^^^^^^^^^^ successfully validated and published data...................");
+			
 		}
 		
 	}
