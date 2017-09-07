@@ -46,6 +46,7 @@ public class RobertBoschUtils {
 	public static ConcurrentHashMap<String, String> catalogue = new ConcurrentHashMap<String, String>();
 	private static List<String> list;
 	public static Channel publishchannel;
+	public static String pubTopic = "valid_data";
 	
 	static {
 		
@@ -57,7 +58,8 @@ public class RobertBoschUtils {
 		props.setProperty("bindingkey", "*.#");
 		props.setProperty("virtualhost", "/");
 		props.setProperty("queuename", "database_queue");
-		props.setProperty("catalogue", "https://smartcity.rbccps.org/api/0.1.0/cat");
+		props.setProperty("catalogue", "http://10.156.14.5:8001/cat");
+		//props.setProperty("catalogue", "https://smartcity.rbccps.org/api/0.1.0/cat");
 		
 	}
 	
@@ -128,8 +130,9 @@ public class RobertBoschUtils {
 			Consumer consumer = new DefaultConsumer(channel) {
 				public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
 					if(body != null) {
-						SchemaBrokerSpout.nbqueue.add(body);
+						//SchemaBrokerSpout.nbqueue.add(body);
 						String message = new String(body, "UTF-8");
+						System.out.println(message);
 						//list.add(message);
 					   // System.out.println(" [x] Received '" + message + "'");
 					}
@@ -176,15 +179,16 @@ public class RobertBoschUtils {
 		
 	}
 	
-	public static void publishFileteredData() {
+	public static void getPublishChannel() {
 		try {
 			ConnectionFactory factory = new ConnectionFactory();
 			factory.setHost(props.getProperty("host"));
 			factory.setPort(Integer.parseInt(props.getProperty("port")));
+			factory.setUsername(props.getProperty("username"));
+			factory.setPassword(props.getProperty("password"));
 			
 			Connection conn = factory.newConnection();
 			publishchannel = conn.createChannel();
-			publishchannel.queueDeclare("validation", false, false, false, null);
 			
 		} catch(IOException e) {
 			e.printStackTrace();
@@ -245,7 +249,7 @@ public class RobertBoschUtils {
 				int index=0;
 				while(index < list.size()) {
 					//RBCCPS_EM_1111
-					boolean status = validateSchema(catalogue.get("RBCCPS_EM_1111"), list.get(index));
+					boolean status = validateSchema(catalogue.get("rbccpsEnergy.EM_D0025860"), list.get(index));
 					if(status) {
 						System.out.println("Voila! It's a match for: " + list.get(index));
 					} else {
@@ -260,11 +264,11 @@ public class RobertBoschUtils {
 	
 	public static void main(String[] args) throws IOException {
 		System.out.println("starting...");
-//		establishCatalogueDBConn();
-//		subscribeToSensorData();
-//		checkValidation();
+		establishCatalogueDBConn();
+		subscribeToSensorData();
+		//checkValidation();
 		
-		publishToBroker("t1");
+		//publishToBroker("t1");
 	}
 	
 }

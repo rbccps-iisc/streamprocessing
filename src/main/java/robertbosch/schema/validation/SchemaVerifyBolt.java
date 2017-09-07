@@ -20,7 +20,6 @@ public class SchemaVerifyBolt extends BaseRichBolt {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private OutputCollector collector;
 
 	public void execute(Tuple tuple) {
 		// TODO Auto-generated method stub
@@ -31,7 +30,7 @@ public class SchemaVerifyBolt extends BaseRichBolt {
 		//get appropriate schema from hashmap and call method validateSchema to get boolean result. If true, data is valid else discard it
 		//fetch type of data (energy meter, street light etc.) from json sensor data, and this will be key of the hash
 		
-		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% size: " + RobertBoschUtils.catalogue.size());
+		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% catalogue size:" + RobertBoschUtils.catalogue.size());
 		if(!RobertBoschUtils.catalogue.containsKey("RBCCPS_EM_1111")) {
 			//establish database conn and fill the hashmap again
 			RobertBoschUtils.establishCatalogueDBConn();
@@ -40,19 +39,22 @@ public class SchemaVerifyBolt extends BaseRichBolt {
 			status = RobertBoschUtils.validateSchema(RobertBoschUtils.catalogue.get("RBCCPS_EM_1111"), sensordata);
 		}
 		
-		System.out.println("############################################ val of status: " + status);
+		System.out.println("############################################ value of status: " + status);
 		if(status) {
-			//collector.emit(new Values(sensordata));
-			//publish to rabbitmq
-			
-		}
-		
+			//publish to rabbitmq topic
+			try {
+				RobertBoschUtils.publishchannel.queueDeclare(RobertBoschUtils.pubTopic, false, false, false, null);
+				RobertBoschUtils.publishchannel.basicPublish("", RobertBoschUtils.pubTopic, null, sensordata.getBytes());
+			} catch(IOException e) {
+				e.printStackTrace();
+			}	
+		}	
 	}
 
 	public void prepare(Map map, TopologyContext context, OutputCollector collector) {
 		// TODO Auto-generated method stub
-		this.collector = collector;
 		RobertBoschUtils utils = new RobertBoschUtils();
+		RobertBoschUtils.getPublishChannel();
 	}
 
 	public void declareOutputFields(OutputFieldsDeclarer fields) {
