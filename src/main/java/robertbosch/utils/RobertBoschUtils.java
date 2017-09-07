@@ -153,6 +153,8 @@ public class RobertBoschUtils {
 			ConnectionFactory factory = new ConnectionFactory();
 			factory.setHost(props.getProperty("host"));
 			factory.setPort(Integer.parseInt(props.getProperty("port")));
+			factory.setUsername(props.getProperty("username"));
+			factory.setPassword(props.getProperty("password"));
 			
 			Connection conn = factory.newConnection();
 			Channel channel = conn.createChannel();
