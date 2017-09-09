@@ -30,7 +30,6 @@ public class SchemaVerifyBolt extends BaseRichBolt {
 		//get appropriate schema from hashmap and call method validateSchema to get boolean result. If true, data is valid else discard it
 		//fetch type of data (energy meter, street light etc.) from json sensor data, and this will be key of the hash
 		
-		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% catalogue size:" + RobertBoschUtils.catalogue.size());
 		if(!RobertBoschUtils.catalogue.containsKey("RBCCPS_EM_1111")) {
 			//establish database conn and fill the hashmap again
 			RobertBoschUtils.establishCatalogueDBConn();

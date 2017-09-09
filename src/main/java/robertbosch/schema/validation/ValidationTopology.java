@@ -11,8 +11,8 @@ import org.apache.storm.topology.TopologyBuilder;
 public class ValidationTopology {
 	public static void main(String[] args) {
 		TopologyBuilder builder = new TopologyBuilder();
-		builder.setSpout("spout", new SchemaBrokerSpout());
-		builder.setBolt("bolt", new SchemaVerifyBolt()).shuffleGrouping("spout");
+		builder.setSpout("sub_spout", new SchemaBrokerSpout());
+		builder.setBolt("validation_bolt", new SchemaVerifyBolt()).shuffleGrouping("sub_spout");
 		
 		Config config = new Config();
 //		LocalCluster cluster = new LocalCluster();
