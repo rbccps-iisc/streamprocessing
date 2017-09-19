@@ -30,7 +30,6 @@ public class SchemaBrokerSpout extends BaseRichSpout {
 				String sensordata = new String(data);
 				values = new Values(sensordata);
 				spoutcollector.emit(values);
-				//values.clear();
 			}
 		}
 		

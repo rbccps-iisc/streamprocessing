@@ -27,7 +27,7 @@ public class ValidationTopology {
 //		cluster.shutdown();
 		
 		try {
-			StormSubmitter.submitTopology("schema_verification", config, builder.createTopology());
+			StormSubmitter.submitTopology("Validation Server", config, builder.createTopology());
 		} catch(InvalidTopologyException invalid) {
 			invalid.printStackTrace();
 		} catch(AlreadyAliveException alive) {

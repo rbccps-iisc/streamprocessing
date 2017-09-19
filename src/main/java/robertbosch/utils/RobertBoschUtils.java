@@ -66,6 +66,7 @@ public class RobertBoschUtils {
 	public static boolean validateSchema(String schema, String data) {
 		boolean status=false;
 		try {
+			
 			JsonNode node = JsonLoader.fromString(data);
 			JsonNode schemanode = JsonLoader.fromString(schema);
 			JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
@@ -132,8 +133,8 @@ public class RobertBoschUtils {
 					if(body != null) {
 						//SchemaBrokerSpout.nbqueue.add(body);
 						String message = new String(body, "UTF-8");
-						System.out.println(message);
-						//list.add(message);
+						System.out.println("message is:" + message);
+						list.add(message);
 					   // System.out.println(" [x] Received '" + message + "'");
 					}
 				}  
@@ -226,14 +227,18 @@ public class RobertBoschUtils {
 			Iterator<JSONObject> itr = items.iterator();
 			while(itr.hasNext()) {
 				JSONObject itemobj = itr.next();
-				String href = itemobj.get("href").toString();
-				JSONArray itemMetaArr = (JSONArray)itemobj.get("item-metadata");
-				Iterator<JSONObject> it = itemMetaArr.iterator();
-				while(it.hasNext()) {
-					JSONObject metaobj = it.next();
-					String schema = metaobj.get("data_schema").toString();
-					catalogue.put(href, schema);
-				}
+				String href = itemobj.get("id").toString();
+				System.out.println(href);
+//				JSONArray itemMetaArr = (JSONArray)itemobj.get("item-metadata");
+//				Iterator<JSONObject> it = itemMetaArr.iterator();
+//				while(it.hasNext()) {
+//					JSONObject metaobj = it.next();
+//					String schema = metaobj.get("data_schema").toString();
+//					catalogue.put(href, schema);
+//				}
+				
+				String schema = itemobj.get("data_schema").toString();
+				catalogue.put(href, schema);
 			}
 			
 		} catch(ParseException pex) {
@@ -265,8 +270,8 @@ public class RobertBoschUtils {
 	public static void main(String[] args) throws IOException {
 		System.out.println("starting...");
 		establishCatalogueDBConn();
-		subscribeToSensorData();
-		//checkValidation();
+		//subscribeToSensorData();
+		checkValidation();
 		
 		//publishToBroker("t1");
 	}
