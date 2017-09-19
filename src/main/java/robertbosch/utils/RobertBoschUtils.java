@@ -133,7 +133,7 @@ public class RobertBoschUtils {
 					if(body != null) {
 						//SchemaBrokerSpout.nbqueue.add(body);
 						String message = new String(body, "UTF-8");
-						System.out.println("message is:" + message);
+						//System.out.println("message is:" + message);
 						list.add(message);
 					   // System.out.println(" [x] Received '" + message + "'");
 					}
@@ -259,17 +259,21 @@ public class RobertBoschUtils {
 					try {
 						Object obj = parse.parse(json);
 						JSONObject jsonob = (JSONObject)obj;
-						String devId = jsonob.get("key").toString();
-						String data = jsonob.get("message").toString();
-						
-						boolean status = validateSchema(catalogue.get(devId), data);
-						if(status) {
-							System.out.println("Voila! It's a match for: " + list.get(index));
+						if(jsonob.containsKey("key")) {
+							String devId = jsonob.get("key").toString();
+							String data = jsonob.get("message").toString();
+							
+							boolean status = validateSchema(catalogue.get(devId), data);
+							if(status) {
+								System.out.println("Voila! It's a match for: " + list.get(index));
+							} else {
+								System.out.println("not a match for: " + list.get(index));
+							}
+							
+							index++;
 						} else {
-							System.out.println("not a match for: " + list.get(index));
+							System.out.println("########## key not present!");
 						}
-						
-						index++;
 						
 					} catch(ParseException p) {
 						p.printStackTrace();
