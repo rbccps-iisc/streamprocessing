@@ -12,7 +12,7 @@ public class ValidationTopology {
 	public static void main(String[] args) {
 		TopologyBuilder builder = new TopologyBuilder();
 		builder.setSpout("subscribe_spout", new SchemaBrokerSpout());
-		builder.setBolt("validation_bolt", new SchemaVerifyBolt()).shuffleGrouping("sub_spout");
+		builder.setBolt("validation_bolt", new SchemaVerifyBolt()).shuffleGrouping("subscribe_spout");
 		
 		Config config = new Config();
 //		LocalCluster cluster = new LocalCluster();
