@@ -254,14 +254,26 @@ public class RobertBoschUtils {
 				int index=0;
 				while(index < list.size()) {
 					//RBCCPS_EM_1111
-					boolean status = validateSchema(catalogue.get("rbccpsEnergy.EM_D0025860"), list.get(index));
-					if(status) {
-						System.out.println("Voila! It's a match for: " + list.get(index));
-					} else {
-						System.out.println("not a match for: " + list.get(index));
+					String json = list.get(index);
+					JSONParser parse = new JSONParser();
+					try {
+						Object obj = parse.parse(json);
+						JSONObject jsonob = (JSONObject)obj;
+						String devId = jsonob.get("key").toString();
+						String data = jsonob.get("message").toString();
+						
+						boolean status = validateSchema(catalogue.get(devId), data);
+						if(status) {
+							System.out.println("Voila! It's a match for: " + list.get(index));
+						} else {
+							System.out.println("not a match for: " + list.get(index));
+						}
+						
+						index++;
+						
+					} catch(ParseException p) {
+						p.printStackTrace();
 					}
-					
-					index++;
 				}
 			}
 		}
