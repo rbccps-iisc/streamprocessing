@@ -131,10 +131,10 @@ public class RobertBoschUtils {
 			Consumer consumer = new DefaultConsumer(channel) {
 				public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
 					if(body != null) {
-						//SchemaBrokerSpout.nbqueue.add(body);
-						String message = new String(body, "UTF-8");
+						SchemaBrokerSpout.nbqueue.add(body);
+						//String message = new String(body, "UTF-8");
 						//System.out.println("message is:" + message);
-						list.add(message);
+						//list.add(message);
 					   // System.out.println(" [x] Received '" + message + "'");
 					}
 				}  
@@ -167,7 +167,7 @@ public class RobertBoschUtils {
 			String[] msgarr = {"abc","def","ghi","jkl","lmn"};
 			for(int i=0;i<msgarr.length;i++) {
 				channel.basicPublish("", topic, null, msgarr[i].getBytes());
-				System.out.println("[*] Sent: " + msgarr[i]);
+				System.out.println("###### published a message to broker");
 			}
 			
 			channel.close();
@@ -228,15 +228,7 @@ public class RobertBoschUtils {
 			while(itr.hasNext()) {
 				JSONObject itemobj = itr.next();
 				String href = itemobj.get("id").toString();
-				System.out.println(href);
-//				JSONArray itemMetaArr = (JSONArray)itemobj.get("item-metadata");
-//				Iterator<JSONObject> it = itemMetaArr.iterator();
-//				while(it.hasNext()) {
-//					JSONObject metaobj = it.next();
-//					String schema = metaobj.get("data_schema").toString();
-//					catalogue.put(href, schema);
-//				}
-				
+				System.out.println(href);				
 				String schema = itemobj.get("data_schema").toString();
 				catalogue.put(href, schema);
 			}

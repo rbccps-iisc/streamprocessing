@@ -1,5 +1,6 @@
 package robertbosch.schema.validation;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -27,9 +28,15 @@ public class SchemaBrokerSpout extends BaseRichSpout {
 		if(nbqueue.size() > 0) {
 			byte[] data = nbqueue.poll();
 			if(data != null) {
-				String sensordata = new String(data);
-				values = new Values(sensordata);
-				spoutcollector.emit(values);
+				//String sensordata = new String(data);
+				String sensordata;
+				try {
+					sensordata = new String(data, "UTF-8");
+					values = new Values(sensordata);
+					spoutcollector.emit(values);
+				} catch (UnsupportedEncodingException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		

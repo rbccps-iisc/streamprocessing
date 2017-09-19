@@ -11,7 +11,7 @@ import org.apache.storm.topology.TopologyBuilder;
 public class ValidationTopology {
 	public static void main(String[] args) {
 		TopologyBuilder builder = new TopologyBuilder();
-		builder.setSpout("sub_spout", new SchemaBrokerSpout());
+		builder.setSpout("subscribe_spout", new SchemaBrokerSpout());
 		builder.setBolt("validation_bolt", new SchemaVerifyBolt()).shuffleGrouping("sub_spout");
 		
 		Config config = new Config();

@@ -12,6 +12,9 @@ import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import robertbosch.utils.RobertBoschUtils;
 
@@ -30,23 +33,41 @@ public class SchemaVerifyBolt extends BaseRichBolt {
 		//get appropriate schema from hashmap and call method validateSchema to get boolean result. If true, data is valid else discard it
 		//fetch type of data (energy meter, street light etc.) from json sensor data, and this will be key of the hash
 		
-		if(!RobertBoschUtils.catalogue.containsKey("RBCCPS_EM_1111")) {
-			//establish database conn and fill the hashmap again
-			RobertBoschUtils.establishCatalogueDBConn();
-			status = RobertBoschUtils.validateSchema(RobertBoschUtils.catalogue.get("RBCCPS_EM_1111"), sensordata);
-		} else {
-			status = RobertBoschUtils.validateSchema(RobertBoschUtils.catalogue.get("RBCCPS_EM_1111"), sensordata);
-		}
-		
-		System.out.println("############################################ value of status: " + status);
-		if(status) {
-			//publish to rabbitmq topic
-			try {
-				RobertBoschUtils.publishchannel.queueDeclare(RobertBoschUtils.pubTopic, false, false, false, null);
-				RobertBoschUtils.publishchannel.basicPublish("", RobertBoschUtils.pubTopic, null, sensordata.getBytes());
-			} catch(IOException e) {
-				e.printStackTrace();
-			}	
+		JSONParser parser = new JSONParser();
+		String devId=null, data=null;
+		try {
+			
+			Object obj = parser.parse(sensordata);
+			JSONObject jsonobj = (JSONObject)obj;
+			if(jsonobj.containsKey("key")) {
+				devId = jsonobj.get("key").toString();
+				data = jsonobj.get("message").toString();
+				
+				if(!RobertBoschUtils.catalogue.containsKey(devId)) {
+					//establish database conn and fill the hashmap again
+					RobertBoschUtils.establishCatalogueDBConn();
+					status = RobertBoschUtils.validateSchema(RobertBoschUtils.catalogue.get(devId), data);
+				} else {
+					status = RobertBoschUtils.validateSchema(RobertBoschUtils.catalogue.get(devId), data);
+				}
+				
+				System.out.println("############################################ value of status: " + status);
+				if(status) {
+					//publish to rabbitmq topic
+					try {
+						RobertBoschUtils.publishchannel.queueDeclare(RobertBoschUtils.pubTopic, false, false, false, null);
+						RobertBoschUtils.publishchannel.basicPublish("", RobertBoschUtils.pubTopic, null, sensordata.getBytes());
+					} catch(IOException e) {
+						e.printStackTrace();
+					}	
+				}
+				
+			} else {
+				System.out.println("$$$$$$ data not in desired schema: " + sensordata);
+			}
+			
+		} catch(ParseException p) {
+			p.printStackTrace();
 		}	
 	}
 
