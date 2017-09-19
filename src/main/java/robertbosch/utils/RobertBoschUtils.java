@@ -131,10 +131,10 @@ public class RobertBoschUtils {
 			Consumer consumer = new DefaultConsumer(channel) {
 				public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
 					if(body != null) {
-						SchemaBrokerSpout.nbqueue.add(body);
-						//String message = new String(body, "UTF-8");
-						//System.out.println("message is:" + message);
-						//list.add(message);
+						//SchemaBrokerSpout.nbqueue.add(body);
+						String message = new String(body, "UTF-8");
+						System.out.println("message is:" + message);
+						list.add(message);
 					   // System.out.println(" [x] Received '" + message + "'");
 					}
 				}  

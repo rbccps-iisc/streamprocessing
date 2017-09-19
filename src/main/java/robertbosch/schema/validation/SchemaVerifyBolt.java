@@ -41,7 +41,7 @@ public class SchemaVerifyBolt extends BaseRichBolt {
 			JSONObject jsonobj = (JSONObject)obj;
 			if(jsonobj.containsKey("key")) {
 				devId = jsonobj.get("key").toString();
-				data = jsonobj.get("message").toString();
+				data = sensordata.split(",")[1].replaceAll("]", "").trim();
 				
 				if(!RobertBoschUtils.catalogue.containsKey(devId)) {
 					//establish database conn and fill the hashmap again
