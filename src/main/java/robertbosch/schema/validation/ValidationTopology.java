@@ -17,7 +17,7 @@ public class ValidationTopology {
 		Config config = new Config();
 //		LocalCluster cluster = new LocalCluster();
 //		
-//		cluster.submitTopology("schema_verification", config, builder.createTopology());
+//		cluster.submitTopology("Validation Server", config, builder.createTopology());
 //		try {
 //			Thread.sleep(100000);
 //		} catch(InterruptedException e) {
