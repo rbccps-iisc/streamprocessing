@@ -262,7 +262,8 @@ public class RobertBoschUtils {
 								System.out.println("not a match for: " + list.get(index));
 							}
 							
-							index++;
+							list.remove(index);
+							//index++;
 						} else {
 							System.out.println("########## key not present!");
 						}
