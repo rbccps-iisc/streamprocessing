@@ -264,9 +264,10 @@ public class RobertBoschUtils {
 							
 							list.remove(index);
 							//index++;
-						} else {
-							System.out.println("########## key not present!");
 						}
+//						else {
+//							System.out.println("########## key not present!");
+//						}
 						
 					} catch(ParseException p) {
 						p.printStackTrace();
