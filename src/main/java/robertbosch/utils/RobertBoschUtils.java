@@ -133,7 +133,7 @@ public class RobertBoschUtils {
 					if(body != null) {
 						//SchemaBrokerSpout.nbqueue.add(body);
 						String message = new String(body, "UTF-8");
-						System.out.println("message is:" + message);
+						//System.out.println("message is:" + message);
 						list.add(message);
 					   // System.out.println(" [x] Received '" + message + "'");
 					}
@@ -255,6 +255,7 @@ public class RobertBoschUtils {
 							String devId = jsonob.get("key").toString();
 							//String data = json.split(",")[1].replaceAll("]", "");
 							String data = jsonob.get("data").toString();
+							System.out.println("data is: " + data);
 							
 							boolean status = validateSchema(catalogue.get(devId), data);
 							if(status) {
