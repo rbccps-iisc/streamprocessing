@@ -253,7 +253,8 @@ public class RobertBoschUtils {
 						JSONObject jsonob = (JSONObject)obj;
 						if(jsonob.containsKey("key")) {
 							String devId = jsonob.get("key").toString();
-							String data = json.split(",")[1].replaceAll("]", "");
+							//String data = json.split(",")[1].replaceAll("]", "");
+							String data = jsonob.get("data").toString();
 							
 							boolean status = validateSchema(catalogue.get(devId), data);
 							if(status) {
