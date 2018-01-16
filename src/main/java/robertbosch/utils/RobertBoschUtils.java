@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeoutException;
 
-import org.bson.Document;
+//import org.bson.Document;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -28,9 +28,9 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
-import com.mongodb.MongoClient;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
+//import com.mongodb.MongoClient;
+//import com.mongodb.client.MongoCollection;
+//import com.mongodb.client.MongoDatabase;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -58,8 +58,8 @@ public class RobertBoschUtils {
 		props.setProperty("bindingkey", "*.#");
 		props.setProperty("virtualhost", "/");
 		props.setProperty("queuename", "database_queue");
-		props.setProperty("catalogue", "http://10.156.14.5:8001/cat");
-		//props.setProperty("catalogue", "https://smartcity.rbccps.org/api/0.1.0/cat");
+		//props.setProperty("catalogue", "http://10.156.14.5:8001/cat");
+		props.setProperty("catalogue", "https://smartcity.rbccps.org/api/0.1.0/cat");
 		
 	}
 	

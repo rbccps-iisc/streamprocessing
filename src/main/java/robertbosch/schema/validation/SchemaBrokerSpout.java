@@ -28,7 +28,6 @@ public class SchemaBrokerSpout extends BaseRichSpout {
 		if(nbqueue.size() > 0) {
 			byte[] data = nbqueue.poll();
 			if(data != null) {
-				//String sensordata = new String(data);
 				String sensordata;
 				try {
 					sensordata = new String(data, "UTF-8");

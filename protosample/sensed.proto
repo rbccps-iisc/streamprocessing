@@ -1,0 +1,11 @@
+message sensor_values {
+	
+	required int32 dataSamplingInstant =1;
+	optional int32 caseTemperature = 2;
+	optional int32 powerConsumption = 3;
+	optional int32 luxOutput = 4;
+	optional int32 ambientLux = 5;
+	optional int32 batteryLevel = 6;
+	optional bool  slaveAlive = 7;
+
+}
