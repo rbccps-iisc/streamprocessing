@@ -1,8 +1,13 @@
 package robertbosch.utils;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 
 import com.google.protobuf.util.JsonFormat;
 import com.protoTest.smartcity.Actuated;
@@ -11,7 +16,8 @@ public class Testproto {
 	
 	public static void main(String[] args) {
 		//writeProtodata();
-		readProtoData();
+		//readProtoData();
+		readInRemoteMode();
 	}
 	
 	private static void readProtoData() {
@@ -33,7 +39,51 @@ public class Testproto {
 	}
 	
 	private static void readInRemoteMode() {
-		
+		try {
+			
+			Class cls = Class.forName("com.protoTest.smartcity.Actuated$targetConfigurations");
+//			for(Method method : cls.getMethods()) {
+//				System.out.println(method.getName());
+//			}
+			
+			Class[] arr = {InputStream.class};
+			Method method = cls.getDeclaredMethod("parseFrom", arr);
+			Object packet = method.invoke(cls, new FileInputStream("/Users/sahiltyagi/Desktop/out.txt"));
+			//System.out.println(packet.toString());
+			
+			Class format = Class.forName("com.google.protobuf.util.JsonFormat");
+			Class[] arr2 = {};
+			Method m2 = format.getDeclaredMethod("printer", arr2);
+			Object printer = m2.invoke(format, null);
+//			System.out.println(printer.getClass());			
+//			com.google.protobuf.MessageOrBuilder
+//			for(Method m : printer.getClass().getMethods()) {
+//				System.out.println(m.getName());
+//				for(Parameter param : m.getParameters()) {
+//					System.out.println(param.getParameterizedType().getTypeName());
+//				}
+//			}
+			
+			Class[] arr3 = {Class.forName("com.google.protobuf.MessageOrBuilder")};
+			Method m3 = printer.getClass().getDeclaredMethod("print", arr3);
+			Object data = m3.invoke(printer, packet);
+			System.out.println(data.toString());
+			System.out.println("done.");
+			
+		} catch(ClassNotFoundException c) {
+			c.printStackTrace();
+		} catch(NoSuchMethodException method) {
+			method.printStackTrace();
+		} catch(FileNotFoundException f) {
+			f.printStackTrace();
+		} catch(IllegalAccessException acc) {
+			acc.printStackTrace();
+		} catch(InvocationTargetException invoke) {
+			invoke.printStackTrace();
+		}
+	}
+	
+	private static void dynamicCompile() {
 		
 	}
 	
