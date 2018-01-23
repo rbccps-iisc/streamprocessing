@@ -21,12 +21,12 @@ import com.protoTest.smartcity.Actuated;
 public class Testproto {
 	
 	public static void main(String[] args) throws IOException {
-		System.out.println("start...");
-		writeProtodata();
-		System.out.println("stop...");
-		//readProtoData();
-		//readInRemoteMode();
-//		dynamicCompile();
+//		System.out.println("start...");
+//		writeProtodata();
+//		System.out.println("stop...");
+//		readProtoData();
+		dynamicCompile();
+		readInRemoteMode();
 //		
 //		ProcessBuilder builder = new ProcessBuilder("/Users/sahiltyagi/Downloads/apache-maven-3.5.2/bin/mvn", "clean", "compile", "assembly:single");
 //		builder.directory(new File("/Users/sahiltyagi/Documents/IISc/protoschema"));
@@ -37,21 +37,40 @@ public class Testproto {
 //			in.printStackTrace();
 //		}
 //		System.out.println("done waiting for compiling");
+//		checkprotoJAR();
 	}
 	
 	private static void checkprotoJAR() {
-		
+		try {
+			Class cls = Class.forName("com.protoTest.smartcity.Prototest");
+			Class[] arr2 = {};
+			Method m2 = cls.getDeclaredMethod("start", arr2);
+			Object printer = m2.invoke(cls, null);
+			System.out.println("end");
+			
+		} catch(ClassNotFoundException cl) {
+			cl.printStackTrace();
+		} catch(NoSuchMethodException nomethod) {
+			nomethod.printStackTrace();
+		} catch(InvocationTargetException invoke) {
+			invoke.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private static void readProtoData() {
 		
 		try {
-			Actuated.targetConfigurations confs = Actuated.targetConfigurations.parseFrom(new FileInputStream("/Users/sahiltyagi/Desktop/out.txt"));
+			Actuated.targetConfigurations confs = Actuated.targetConfigurations.parseFrom(new FileInputStream("/Users/sahiltyagi/Desktop/out2.txt"));
+			//Actuated.targetConfigurations confs = Actuated.targetConfigurations.parseFrom(data)
 			System.out.println(confs.getPowerState().getTargetPowerState());
 			System.out.println(confs.getControlPolicy().getControlPolicy());
 			System.out.println(confs.getManualControlParams().getTargetBrightnessLevel());
 			
-			Object ob = Actuated.targetConfigurations.parseFrom(new FileInputStream("/Users/sahiltyagi/Desktop/out.txt"));
+			Object ob = Actuated.targetConfigurations.parseFrom(new FileInputStream("/Users/sahiltyagi/Desktop/out2.txt"));
 			String packet=JsonFormat.printer().print((Actuated.targetConfigurations)ob);
 			System.out.println(packet);
 			
@@ -79,12 +98,14 @@ public class Testproto {
 			
 			// one variable to set location of generated .proto files, another variable to specify the package to place generated java class into it
 			String[] command = {"/usr/local/bin/protoc", "--proto_path=/Users/sahiltyagi/Desktop", 
-							"--java_out=/Users/sahiltyagi/Documents/IISc/protoschema/src/main/java/com/protoTest/smartcity", "actuated4.proto"};
+							"--java_out=/Users/sahiltyagi/Documents/IISc/protoschema/src/main/java", "actuated5.proto"};
 			Process proc = Runtime.getRuntime().exec(command);
+			int protogen = proc.waitFor();
 			
-//			ProcessBuilder builder = new ProcessBuilder("/Users/sahiltyagi/Downloads/apache-maven-3.5.2/bin/mvn", "clean", "compile", "assembly:single");
-//			builder.directory(new File("/Users/sahiltyagi/Documents/IISc/protoschema"));
-//			Process compile = builder.start();
+			ProcessBuilder builder = new ProcessBuilder("/Users/sahiltyagi/Downloads/apache-maven-3.5.2/bin/mvn", "clean", "compile", "assembly:single");
+			builder.directory(new File("/Users/sahiltyagi/Documents/IISc/protoschema"));
+			Process compile = builder.start();
+			int wait = compile.waitFor();
 			
 			System.out.println("done");
 			
@@ -92,20 +113,22 @@ public class Testproto {
 			urlex.printStackTrace();
 		} catch(IOException e) {
 			e.printStackTrace();
+		} catch(InterruptedException in) {
+			in.printStackTrace();
 		}
 	}
 	
 	private static void readInRemoteMode() {
 		try {
 			
-			Class cls = Class.forName("com.protoTest.smartcity.Actuated$targetConfigurations");
+			Class cls = Class.forName("com.protoTest.smartcity.Actuated5$targetConfigurations");
 //			for(Method method : cls.getMethods()) {
 //				System.out.println(method.getName());
 //			}
 			
 			Class[] arr = {InputStream.class};
 			Method method = cls.getDeclaredMethod("parseFrom", arr);
-			Object packet = method.invoke(cls, new FileInputStream("/Users/sahiltyagi/Desktop/out.txt"));
+			Object packet = method.invoke(cls, new FileInputStream("/Users/sahiltyagi/Desktop/out2.txt"));
 			//System.out.println(packet.toString());
 			
 			Class format = Class.forName("com.google.protobuf.util.JsonFormat");
