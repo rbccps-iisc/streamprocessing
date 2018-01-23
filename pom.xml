@@ -80,26 +80,25 @@
       	<scope>compile</scope>
     </dependency>
 	
-	<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java-util -->
 	<dependency>
+    		<groupId>com.protoTest</groupId>
+   	 	<artifactId>protoschema</artifactId>
+    		<version>1.0-SNAPSHOT</version>
+    		<scope>system</scope>
+    		<systemPath>/Users/sahiltyagi/Documents/IISc/protoschema/target/protoschema-1.0-SNAPSHOT-jar-with-dependencies.jar</systemPath>
+    </dependency>
+    
+    <dependency>
     		<groupId>com.google.protobuf</groupId>
     		<artifactId>protobuf-java-util</artifactId>
     		<version>3.5.0</version>
 	</dependency>
 	
-	<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
 	<dependency>
     		<groupId>com.google.protobuf</groupId>
     		<artifactId>protobuf-java</artifactId>
     		<version>3.5.0</version>
 	</dependency>
-	
-	<dependency>
-    		<groupId>com.protoTest</groupId>
-   	 	<artifactId>protoschema</artifactId>
-    		<version>1.0</version>
-    		<scope>system</scope>
-    		<systemPath>/Users/sahiltyagi/Documents/IISc/protoschema/target/protoschema-1.0-SNAPSHOT-jar-with-dependencies.jar</systemPath>
-    </dependency>
+    
   </dependencies>
 </project>
