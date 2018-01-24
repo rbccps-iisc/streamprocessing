@@ -2,6 +2,7 @@ package robertbosch.schema.validation;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -23,6 +24,7 @@ public class SchemaVerifyBolt extends BaseRichBolt {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	public static ConcurrentLinkedQueue<String> protos=null;
 
 	public void execute(Tuple tuple) {
 		// TODO Auto-generated method stub
@@ -73,6 +75,7 @@ public class SchemaVerifyBolt extends BaseRichBolt {
 
 	public void prepare(Map map, TopologyContext context, OutputCollector collector) {
 		// TODO Auto-generated method stub
+		protos = new ConcurrentLinkedQueue();
 		RobertBoschUtils utils = new RobertBoschUtils();
 		RobertBoschUtils.getPublishChannel();
 	}

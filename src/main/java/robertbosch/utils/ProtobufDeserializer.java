@@ -12,10 +12,12 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import robertbosch.schema.validation.SchemaVerifyBolt;
+
 public class ProtobufDeserializer {
 	
-	public static String deserialize(byte[] buffer, String mainclass, String message) {
-		String deserData=null;
+	private static String deserialize(byte[] buffer, String mainclass, String message) {
+		Object data=null;
 		try {
 			Class cls = Class.forName("com.protoTest.smartcity."+mainclass+"$"+message);
 			Class[] arr = {buffer.getClass()};
@@ -29,8 +31,7 @@ public class ProtobufDeserializer {
 			
 			Class[] arr3 = {Class.forName("com.google.protobuf.MessageOrBuilder")};
 			Method convertmethod = printer.getClass().getDeclaredMethod("print", arr3);
-			Object data = convertmethod.invoke(printer, packet);
-			deserData = data.toString();
+			data = convertmethod.invoke(printer, packet);
 			
 		} catch(ClassNotFoundException c) {
 			c.printStackTrace();
@@ -42,7 +43,7 @@ public class ProtobufDeserializer {
 			invoke.printStackTrace();
 		}
 		
-		return deserData.toString();
+		return data.toString();
 	}
 	
 	private static void generateProtobufClasses(String url) {
@@ -79,10 +80,16 @@ public class ProtobufDeserializer {
 		}
 	}
 	
-	public static void performActionOnData() {
+	public void performActionOnData(byte[] buffer, String url, String message) {
 		//if list in supervisor task does not contain proto file name (upper case), then run  generateProtobufClasses(url method), followed by deserializer method
 		//otherwise, run deserializer method ONLY
+		if(!SchemaVerifyBolt.protos.contains(url)) {
+			generateProtobufClasses(url);
+		}
 		
+		String protoname= RobertBoschUtils.protofiles + url.split("/")[url.split("/").length -1].split(".")[0];
+		String mainclass = protoname.substring(0, 1).toUpperCase() + protoname.substring(1);
+		deserialize(buffer, mainclass, message);
 		
 	}
 	
