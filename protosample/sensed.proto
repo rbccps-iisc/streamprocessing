@@ -1,3 +1,7 @@
+
+syntax = "proto2";
+option java_package= "com.protoTest.smartcity";
+
 message sensor_values {
 	
 	required int32 dataSamplingInstant =1;

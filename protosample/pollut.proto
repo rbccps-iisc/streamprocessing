@@ -1,0 +1,9 @@
+syntax="proto2";
+option java_package= "com.protoTest.smartcity";
+
+message pollution{
+	optional int32 PM2_5 = 1;
+	optional float NOISELEVEL =2;
+	optional int32 CO2 = 3;
+	optional int32 PM10 =4;
+}

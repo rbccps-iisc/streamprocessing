@@ -1,9 +1,11 @@
 
-syntax = "proto3";
+syntax = "proto2";
+option java_package= "com.protoTest.smartcity";
+
 
 	message targetPowerStateParams{
 
-		bool targetPowerState = 1;
+		required bool targetPowerState = 1;
 		
 	}
 
@@ -19,29 +21,29 @@ syntax = "proto3";
 
 	message targetControlPolicy{
 
-		ctrlPolicy controlPolicy = 1;
+		required ctrlPolicy controlPolicy = 1;
 		
 	}
 
 	message targetManualControlParams{
 
-		int32 targetBrightnessLevel = 1;
+		optional uint32 targetBrightnessLevel = 1;
 	
 	}
 
 
 	message targetAutoTimerParams{
 
-		int32 targetOnTime = 1;
-		int32 targetOffTime = 2;
+		optional uint32 targetOnTime = 1;
+		optional uint32 targetOffTime = 2;
 	
 
 	}
 	
 	message targetAutoLuxParams{
 
-		int32 targetOnLux = 1;
-		int32 targetOffLux = 2;
+		optional uint32 targetOnLux = 1;
+		optional uint32 targetOffLux = 2;
 
 	}
 	
@@ -49,10 +51,10 @@ syntax = "proto3";
 
 	message targetConfigurations{
 
-		targetPowerStateParams  PowerState = 1;
-		targetControlPolicy ControlPolicy = 2;
-		targetAutoTimerParams AutoTimerParams = 3;
-		targetAutoLuxParams AutoLuxParams = 4;
-		targetManualControlParams ManualControlParams =5;
+		optional targetPowerStateParams  PowerState = 1;
+		optional targetControlPolicy ControlPolicy = 2;
+		optional targetAutoTimerParams AutoTimerParams = 3;
+		optional targetAutoLuxParams AutoLuxParams = 4;
+		optional targetManualControlParams ManualControlParams =5;
 	
 	}
