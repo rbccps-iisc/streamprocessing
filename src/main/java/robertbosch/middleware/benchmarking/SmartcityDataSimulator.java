@@ -5,6 +5,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.json.simple.JSONObject;
 
+import com.protoTest.smartcity.Pollut;
 import com.protoTest.smartcity.Sensed;
 
 import robertbosch.utils.RobertBoschUtils;
@@ -65,6 +66,21 @@ public class SmartcityDataSimulator {
 		
 	}
 	
+	private void protopollution() {
+		
+		int pm25 = ThreadLocalRandom.current().nextInt(100, 1001);
+		int pm10 = ThreadLocalRandom.current().nextInt(100, 1001);
+		int co2 = ThreadLocalRandom.current().nextInt(10, 50);
+		float noiselevel = ThreadLocalRandom.current().nextInt(0, 100);
+		
+		Pollut.pollution.Builder pollutiondata = Pollut.pollution.newBuilder();
+		pollutiondata.setPM25(pm25);
+		pollutiondata.setPM10(pm10);
+		pollutiondata.setCO2(co2);
+		pollutiondata.setNOISELEVEL(noiselevel);
+		
+	}
+	
 	private void jsonenergyMeter() {
 		
 		double YPhaseReactivePower = ThreadLocalRandom.current().nextDouble(5, 30);
@@ -114,6 +130,12 @@ public class SmartcityDataSimulator {
 		
 		String packet = "[\"key\": \"energymeter_id\"," + data.toJSONString() + "]";
 		System.out.println(packet);
+	}
+	
+	private static void publishToBroker() {
+		
+		
+		
 	}
 	
 	public static void main(String[] args) {
