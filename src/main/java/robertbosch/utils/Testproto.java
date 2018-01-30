@@ -25,8 +25,8 @@ public class Testproto {
 //		writeProtodata();
 //		System.out.println("stop...");
 //		readProtoData();
-		dynamicCompile();
-		readInRemoteMode();
+//		dynamicCompile();
+//		readInRemoteMode();
 //		
 //		ProcessBuilder builder = new ProcessBuilder("/Users/sahiltyagi/Downloads/apache-maven-3.5.2/bin/mvn", "clean", "compile", "assembly:single");
 //		builder.directory(new File("/Users/sahiltyagi/Documents/IISc/protoschema"));
@@ -38,6 +38,9 @@ public class Testproto {
 //		}
 //		System.out.println("done waiting for compiling");
 //		checkprotoJAR();
+		
+		
+		
 	}
 	
 	private static void checkprotoJAR() {
@@ -91,6 +94,10 @@ public class Testproto {
 			while((proto = rdr.readLine()) != null) {
 				schema += proto;
 				bfrwrtr.write(proto+"\n");
+				if(proto.equals("syntax = \"proto2\";")) {
+					bfrwrtr.write("option java_package= \"com.protoTest.smartcity\";");
+				}
+				
 			}
 			rdr.close();
 			System.out.println(schema);

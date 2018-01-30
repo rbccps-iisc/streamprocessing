@@ -1,12 +1,18 @@
 package robertbosch.middleware.benchmarking;
 
+import java.io.IOException;
+import java.util.UUID;
 //import java.io.IOException;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeoutException;
 
 import org.json.simple.JSONObject;
 
 import com.protoTest.smartcity.Pollut;
 import com.protoTest.smartcity.Sensed;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
 
 import robertbosch.utils.RobertBoschUtils;
 
@@ -33,7 +39,9 @@ public class SmartcityDataSimulator {
 		data.put("batteryLevel", batterylevel);
 		data.put("dataSamplingInstant", dataSamplingInstant);
 		
-		String packet = "[\"key\": \"streetlight_id\"," + data.toJSONString() + "]";
+		String deviceId = "streetlight-" + UUID.randomUUID().toString();
+		
+		String packet = "[\"key\": \"" + deviceId + "\"," + data.toJSONString() + "]";
 		System.out.println(packet);
 		
 //		try {
@@ -128,14 +136,33 @@ public class SmartcityDataSimulator {
 		data.put("dataSamplingInstant", dataSamplingInstant);
 		data.put("EnergyActive", EnergyActive);
 		
-		String packet = "[\"key\": \"energymeter_id\"," + data.toJSONString() + "]";
+		String deviceId = "energy-" + UUID.randomUUID().toString();
+		
+		//String packet = "[\"key\": \"energymeter_id\"," + data.toJSONString() + "]";
+		String packet = "[\"key\": \"" + deviceId + "\"," + data.toJSONString() + "]";
 		System.out.println(packet);
 	}
 	
-	private static void publishToBroker() {
+	private static Channel createbrokerChannel(String deviceId) {
 		
+		ConnectionFactory connfac = new ConnectionFactory();
+		connfac.setHost("10.156.14.6");
+		connfac.setPort(5672);
+		connfac.setUsername("rbccps");
+		connfac.setPassword("rbccps@123");
+		Channel channel = null;
 		
-		
+		try {
+			Connection conn = connfac.newConnection();
+			channel = conn.createChannel();
+			channel.queueDeclare(deviceId, false, false, false, null);
+			
+		} catch(IOException e) {
+			e.printStackTrace();
+		} catch(TimeoutException t) {
+			t.printStackTrace();
+		}
+		return channel;
 	}
 	
 	public static void main(String[] args) {
