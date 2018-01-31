@@ -39,6 +39,7 @@ import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
+import robertbosch.schema.validation.SPOUTvalidator;
 import robertbosch.schema.validation.SchemaBrokerSpout;
 
 public class RobertBoschUtils {
@@ -137,10 +138,11 @@ public class RobertBoschUtils {
 				public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
 					if(body != null) {
 						//SchemaBrokerSpout.nbqueue.add(body);
-						String message = new String(body, "UTF-8");
+						//String message = new String(body, "UTF-8");
 						//System.out.println("message is:" + message);
-						list.add(message);
-					   // System.out.println(" [x] Received '" + message + "'");
+						//list.add(message);
+						//System.out.println(" [x] Received '" + message + "'");
+						
 					}
 				}  
 			};
@@ -154,7 +156,50 @@ public class RobertBoschUtils {
 		} catch(TimeoutException t) {
 			t.printStackTrace();
 		}
-	}	
+	}
+	
+	public static void subscribeNetworkServer(String deviceId) {
+		try {
+			
+			ConnectionFactory factory = new ConnectionFactory();
+			factory.setHost(props.getProperty("host"));
+			factory.setPort(Integer.parseInt(props.getProperty("port")));
+			factory.setUsername(props.getProperty("username"));
+			factory.setPassword(props.getProperty("password"));
+			factory.setVirtualHost(props.getProperty("virtualhost"));
+
+			Connection conn = factory.newConnection();
+			Channel channel = conn.createChannel();
+			channel.exchangeDeclare(props.getProperty("exchange"), deviceId, true);
+			
+			System.out.println("going to subscribe for device: " + deviceId);
+			Consumer consumer = new DefaultConsumer(channel) {
+				public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+					if(body != null) {
+						
+						ConcurrentLinkedQueue<byte[]> nonblockingqueue = new ConcurrentLinkedQueue<byte[]>();
+						nonblockingqueue.add(deviceId.getBytes());
+						nonblockingqueue.add(body);
+						
+						if(!nonblockingqueue.isEmpty()) {
+							SPOUTvalidator.brokerqueue.add(nonblockingqueue);
+							nonblockingqueue.clear();
+						}
+						
+					}
+				}  
+			};
+			
+			channel.queueDeclare(props.getProperty("queuename"), true, false, false, null);
+			channel.queueBind(props.getProperty("queuename"), props.getProperty("exchange"), props.getProperty("bindingkey"));
+			channel.basicConsume(props.getProperty("queuename"), true, consumer);
+			
+		} catch(IOException e) {
+			e.printStackTrace();
+		} catch(TimeoutException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	//local function
 	public static void publishToBroker(String topic) {
@@ -205,7 +250,7 @@ public class RobertBoschUtils {
 	
 	
 	//need to populate it with template_id and schema json string as key and value
-	public static void establishCatalogueDBConn() {
+	public static void queryCatalogurServer() {
 		String catstring="";
 		try {
 			URL catURL = new URL(props.getProperty("catalogue"));
@@ -232,12 +277,26 @@ public class RobertBoschUtils {
 			Iterator<JSONObject> itr = items.iterator();
 			while(itr.hasNext()) {
 				JSONObject itemobj = itr.next();
-				String href = itemobj.get("id").toString();
-				System.out.println(href);				
-				String schema = itemobj.get("data_schema").toString();
-				catalogue.put(href, schema);
+				
+				String devId = itemobj.get("id").toString();
+				System.out.println(devId);
+				
+				//establish one broker client per device. Total number of rabbitmq clients is equal to the size of the catalogue hashmap
+				if(!SPOUTvalidator.deviceprotoschema.containsKey(devId)) {
+					
+					String schema = itemobj.get("data_schema").toString();
+					catalogue.put(devId, schema);
+					
+					obj = parse.parse(itemobj.get("serialization_from_device").toString());
+					jsonobj = (JSONObject)obj;
+					SPOUTvalidator.deviceprotoschema.put(devId, jsonobj.get("mainMessageName").toString() + "___" + jsonobj.get("link").toString());
+					RobertBoschUtils.subscribeNetworkServer(devId);
+					
+				}
+				
 			}
 			
+			System.out.println("fully read the catalogue server...");
 		} catch(ParseException pex) {
 			pex.printStackTrace();
 		}
@@ -286,9 +345,9 @@ public class RobertBoschUtils {
 	
 	public static void main(String[] args) throws IOException {
 		System.out.println("starting...");
-		establishCatalogueDBConn();
+		queryCatalogurServer();
 		//subscribeToSensorData();
-		checkValidation();
+		//checkValidation();
 		
 		//publishToBroker("t1");
 	}

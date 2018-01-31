@@ -24,7 +24,8 @@ public class SchemaVerifyBolt extends BaseRichBolt {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	public static ConcurrentLinkedQueue<String> protos=null;
+	public static String deviceId;
+	public static Object obj;
 
 //	public void execute(Tuple tuple) {
 //		// TODO Auto-generated method stub
@@ -81,7 +82,6 @@ public class SchemaVerifyBolt extends BaseRichBolt {
 
 	public void prepare(Map map, TopologyContext context, OutputCollector collector) {
 		// TODO Auto-generated method stub
-		protos = new ConcurrentLinkedQueue();
 		RobertBoschUtils utils = new RobertBoschUtils();
 		RobertBoschUtils.getPublishChannel();
 	}

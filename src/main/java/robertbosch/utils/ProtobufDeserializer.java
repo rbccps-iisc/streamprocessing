@@ -53,9 +53,9 @@ public class ProtobufDeserializer {
 	public static String deserialize(byte[] buffer, String url, String message) {
 		//if list in supervisor task does not contain proto file name (uppercase), then run  generateProtobufClasses(url method), followed by deserializer method
 		//otherwise, run deserializer method ONLY
-		if(!SchemaVerifyBolt.protos.contains(url)) {
-			generateProtobufClasses(url);
-		}
+//		if(!SchemaVerifyBolt.protos.contains(url)) {
+//			generateProtobufClasses(url);
+//		}
 		
 		String protofile= RobertBoschUtils.protofiles + url.split("/")[url.split("/").length -1].split(".")[0];
 		String mainclass = protofile.substring(0, 1).toUpperCase() + protofile.substring(1);
