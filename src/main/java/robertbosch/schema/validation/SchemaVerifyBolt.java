@@ -83,7 +83,7 @@ public class SchemaVerifyBolt extends BaseRichBolt {
 	public void prepare(Map map, TopologyContext context, OutputCollector collector) {
 		// TODO Auto-generated method stub
 		RobertBoschUtils utils = new RobertBoschUtils();
-		RobertBoschUtils.getPublishChannel();
+		utils.getPublishChannel();
 	}
 
 	public void declareOutputFields(OutputFieldsDeclarer fields) {

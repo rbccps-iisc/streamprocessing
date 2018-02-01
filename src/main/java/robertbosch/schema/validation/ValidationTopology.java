@@ -11,29 +11,29 @@ import org.apache.storm.topology.TopologyBuilder;
 public class ValidationTopology {
 	public static void main(String[] args) {
 		TopologyBuilder builder = new TopologyBuilder();
-		builder.setSpout("subscribe_spout", new SchemaBrokerSpout());
-		builder.setBolt("validation_bolt", new SchemaVerifyBolt()).shuffleGrouping("subscribe_spout");
+		builder.setSpout("subscribe_spout", new NetworkserverSpout());
+		builder.setBolt("validation_bolt", new BOLTvalidator()).shuffleGrouping("subscribe_spout");
 		
 		Config config = new Config();
-//		LocalCluster cluster = new LocalCluster();
-//		
-//		cluster.submitTopology("Validation Server", config, builder.createTopology());
-//		try {
-//			Thread.sleep(100000);
-//		} catch(InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		cluster.shutdown();
+		LocalCluster cluster = new LocalCluster();
 		
+		cluster.submitTopology("Validation Server", config, builder.createTopology());
 		try {
-			StormSubmitter.submitTopology("Validation Server", config, builder.createTopology());
-		} catch(InvalidTopologyException invalid) {
-			invalid.printStackTrace();
-		} catch(AlreadyAliveException alive) {
-			alive.printStackTrace();
-		} catch(AuthorizationException auth) {
-			auth.printStackTrace();
+			Thread.sleep(100000);
+		} catch(InterruptedException e) {
+			e.printStackTrace();
 		}
+		
+		cluster.shutdown();
+		
+//		try {
+//			StormSubmitter.submitTopology("Validation Server", config, builder.createTopology());
+//		} catch(InvalidTopologyException invalid) {
+//			invalid.printStackTrace();
+//		} catch(AlreadyAliveException alive) {
+//			alive.printStackTrace();
+//		} catch(AuthorizationException auth) {
+//			auth.printStackTrace();
+//		}
 	}
 }

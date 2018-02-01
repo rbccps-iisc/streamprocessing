@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import robertbosch.schema.validation.NetworkserverSpout;
 import robertbosch.schema.validation.SchemaVerifyBolt;
 
 public class ProtobufDeserializer {
@@ -50,12 +51,12 @@ public class ProtobufDeserializer {
 		}
 	}
 	
-	public static String deserialize(byte[] buffer, String url, String message) {
+	public static String deserialize(byte[] buffer, String message, String url) {
 		//if list in supervisor task does not contain proto file name (uppercase), then run  generateProtobufClasses(url method), followed by deserializer method
 		//otherwise, run deserializer method ONLY
-//		if(!SchemaVerifyBolt.protos.contains(url)) {
-//			generateProtobufClasses(url);
-//		}
+		if(!NetworkserverSpout.protoURLs.contains(url)) {
+			generateProtobufClasses(url);
+		}
 		
 		String protofile= RobertBoschUtils.protofiles + url.split("/")[url.split("/").length -1].split(".")[0];
 		String mainclass = protofile.substring(0, 1).toUpperCase() + protofile.substring(1);

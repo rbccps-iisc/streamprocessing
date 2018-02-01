@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -16,7 +18,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeoutException;
 
-//import org.bson.Document;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -28,9 +36,9 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
-//import com.mongodb.MongoClient;
-//import com.mongodb.client.MongoCollection;
-//import com.mongodb.client.MongoDatabase;
+import com.google.protobuf.util.JsonFormat;
+import com.protoTest.smartcity.Sensed;
+
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -39,10 +47,9 @@ import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
-import robertbosch.schema.validation.SPOUTvalidator;
-import robertbosch.schema.validation.SchemaBrokerSpout;
+import robertbosch.schema.validation.NetworkserverSpout;
 
-public class RobertBoschUtils {
+public class RobertBoschUtils implements MqttCallback {
 	public static Properties props = new Properties();
 	public static ConcurrentHashMap<String, String> catalogue = new ConcurrentHashMap<String, String>();
 	private static List<String> list;
@@ -59,8 +66,8 @@ public class RobertBoschUtils {
 		props.setProperty("bindingkey", "*.#");
 		props.setProperty("virtualhost", "/");
 		props.setProperty("queuename", "database_queue");
-		//props.setProperty("catalogue", "http://10.156.14.5:8001/cat");
-		props.setProperty("catalogue", "https://smartcity.rbccps.org/api/0.1.0/cat");
+		props.setProperty("catalogue", "http://10.156.14.5:8001/cat");
+		//props.setProperty("catalogue", "https://smartcity.rbccps.org/api/0.1.0/cat");
 		props.setProperty("protocompiler", "protoc");
 		props.setProperty("protopath", "/Users/sahiltyagi/Desktop");
 		props.setProperty("javapath", "/Users/sahiltyagi/Documents/IISc/protoschema/src/main/java");
@@ -121,46 +128,44 @@ public class RobertBoschUtils {
 	}
 	
 	public static void subscribeToSensorData() {
+//		try {
+//			ConnectionFactory factory = new ConnectionFactory();
+//			factory.setHost(props.getProperty("host"));
+//			factory.setPort(Integer.parseInt(props.getProperty("port")));
+//			factory.setUsername(props.getProperty("username"));
+//			factory.setPassword(props.getProperty("password"));
+//			factory.setVirtualHost(props.getProperty("virtualhost"));
+//
+//			Connection conn = factory.newConnection();
+//			Channel channel = conn.createChannel();
+//			channel.exchangeDeclare(props.getProperty("exchange"), "topic", true);
+//			
+//			System.out.println("going to subscribe...");
+//			Consumer consumer = new DefaultConsumer(channel) {
+//				public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+//					if(body != null) {
+//						//SchemaBrokerSpout.nbqueue.add(body);
+//						//String message = new String(body, "UTF-8");
+//						//System.out.println("message is:" + message);
+//						//list.add(message);
+//						//System.out.println(" [x] Received '" + message + "'");
+//						
+//					}
+//				}  
+//			};
+//			
+//			channel.queueDeclare(props.getProperty("queuename"), true, false, false, null);
+//			channel.queueBind(props.getProperty("queuename"), props.getProperty("exchange"), props.getProperty("bindingkey"));
+//			channel.basicConsume(props.getProperty("queuename"), true, consumer);
+//			
+//		} catch(IOException e) {
+//			e.printStackTrace();
+//		} catch(TimeoutException t) {
+//			t.printStackTrace();
+//		}
+		
 		try {
-			ConnectionFactory factory = new ConnectionFactory();
-			factory.setHost(props.getProperty("host"));
-			factory.setPort(Integer.parseInt(props.getProperty("port")));
-			factory.setUsername(props.getProperty("username"));
-			factory.setPassword(props.getProperty("password"));
-			factory.setVirtualHost(props.getProperty("virtualhost"));
-
-			Connection conn = factory.newConnection();
-			Channel channel = conn.createChannel();
-			channel.exchangeDeclare(props.getProperty("exchange"), "topic", true);
-			
-			System.out.println("going to subscribe...");
-			Consumer consumer = new DefaultConsumer(channel) {
-				public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-					if(body != null) {
-						//SchemaBrokerSpout.nbqueue.add(body);
-						//String message = new String(body, "UTF-8");
-						//System.out.println("message is:" + message);
-						//list.add(message);
-						//System.out.println(" [x] Received '" + message + "'");
-						
-					}
-				}  
-			};
-			
-			channel.queueDeclare(props.getProperty("queuename"), true, false, false, null);
-			channel.queueBind(props.getProperty("queuename"), props.getProperty("exchange"), props.getProperty("bindingkey"));
-			channel.basicConsume(props.getProperty("queuename"), true, consumer);
-			
-		} catch(IOException e) {
-			e.printStackTrace();
-		} catch(TimeoutException t) {
-			t.printStackTrace();
-		}
-	}
-	
-	public static void subscribeNetworkServer(String deviceId) {
-		try {
-			
+			String deviceId=null;
 			ConnectionFactory factory = new ConnectionFactory();
 			factory.setHost(props.getProperty("host"));
 			factory.setPort(Integer.parseInt(props.getProperty("port")));
@@ -182,7 +187,7 @@ public class RobertBoschUtils {
 						nonblockingqueue.add(body);
 						
 						if(!nonblockingqueue.isEmpty()) {
-							SPOUTvalidator.brokerqueue.add(nonblockingqueue);
+							//NetworkserverSpout.brokerqueue.add(nonblockingqueue);
 							nonblockingqueue.clear();
 						}
 						
@@ -199,6 +204,29 @@ public class RobertBoschUtils {
 		} catch(TimeoutException e) {
 			e.printStackTrace();
 		}
+		
+		
+	}
+	
+	public void subscribeToNetworkServer() {
+		try {
+			
+			MqttConnectOptions connection = new MqttConnectOptions();
+			connection.setAutomaticReconnect(true);
+			connection.setCleanSession(false);
+			connection.setConnectionTimeout(30);
+			connection.setUserName("loraserver");
+			connection.setPassword("loraserver".toCharArray());
+			
+			MqttClient client = new MqttClient("tcp://gateways.rbccps.org:1883", MqttClient.generateClientId());
+			client.setCallback(this);
+			client.connect(connection);
+			client.subscribe("application/1/node/+/rx", 2);
+			
+		} catch(MqttException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	//local function
@@ -230,7 +258,7 @@ public class RobertBoschUtils {
 		
 	}
 	
-	public static void getPublishChannel() {
+	public void getPublishChannel() {
 		try {
 			ConnectionFactory factory = new ConnectionFactory();
 			factory.setHost(props.getProperty("host"));
@@ -250,7 +278,7 @@ public class RobertBoschUtils {
 	
 	
 	//need to populate it with template_id and schema json string as key and value
-	public static void queryCatalogurServer() {
+	public void queryCatalogurServer() {
 		String catstring="";
 		try {
 			URL catURL = new URL(props.getProperty("catalogue"));
@@ -282,16 +310,16 @@ public class RobertBoschUtils {
 				System.out.println(devId);
 				
 				//establish one broker client per device. Total number of rabbitmq clients is equal to the size of the catalogue hashmap
-				if(!SPOUTvalidator.deviceprotoschema.containsKey(devId)) {
+				if(!NetworkserverSpout.deviceprotoschema.containsKey(devId)) {
 					
 					String schema = itemobj.get("data_schema").toString();
 					catalogue.put(devId, schema);
 					
 					obj = parse.parse(itemobj.get("serialization_from_device").toString());
 					jsonobj = (JSONObject)obj;
-					SPOUTvalidator.deviceprotoschema.put(devId, jsonobj.get("mainMessageName").toString() + "___" + jsonobj.get("link").toString());
-					RobertBoschUtils.subscribeNetworkServer(devId);
 					
+					NetworkserverSpout.protoURLs.add(jsonobj.get("link").toString());
+					NetworkserverSpout.deviceprotoschema.put(devId, jsonobj.get("mainMessageName").toString() + "___" + jsonobj.get("link").toString());
 				}
 				
 			}
@@ -343,13 +371,52 @@ public class RobertBoschUtils {
 		}
 	}
 	
-	public static void main(String[] args) throws IOException {
+	
+	public static ConcurrentLinkedQueue<byte[]> arrtest = new ConcurrentLinkedQueue<byte[]>();
+	public static void main(String[] args) throws Exception {
 		System.out.println("starting...");
-		queryCatalogurServer();
-		//subscribeToSensorData();
-		//checkValidation();
+		RobertBoschUtils rb = new RobertBoschUtils();
+		rb.subscribeToNetworkServer();
+		System.out.println("subscribed to n/w server...");
+		while(true) {
+			if(arrtest.size() > 0) {
+				
+				byte[] data = arrtest.poll();
+				String loradata = new String(data, StandardCharsets.UTF_8);
+				System.out.println("final data: " + loradata);
+				JSONParser parser = new JSONParser();
+				Object obj = parser.parse(loradata);
+				JSONObject jsonob = (JSONObject)obj;
+				String protobinary = jsonob.get("data").toString();
+				byte[] decode = Base64.getDecoder().decode(protobinary);
+				
+				Object o = Sensed.sensor_values.parseFrom(decode);
+				String packet=JsonFormat.printer().print((Sensed.sensor_values)o);
+				System.out.println("packet is:" + packet);
+				
+			}
+		}
 		
-		//publishToBroker("t1");
+	}
+
+	@Override
+	public void connectionLost(Throwable arg0) {
+		// TODO Auto-generated method stub
+		System.out.println("lost connection to mqtt LoRA server");
+	}
+
+	@Override
+	public void deliveryComplete(IMqttDeliveryToken arg0) {
+		// TODO Auto-generated method stub
+		System.out.println("delivery complete...");
+	}
+
+	@Override
+	public void messageArrived(String arg0, MqttMessage arg1) throws Exception {
+		// TODO Auto-generated method stub
+		//arrtest.add(arg1.getPayload());
+		NetworkserverSpout.loraserverqueue.add(arg1.getPayload());
+		
 	}
 	
 }

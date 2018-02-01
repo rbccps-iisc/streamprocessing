@@ -52,7 +52,7 @@ public class SchemaBrokerSpout extends BaseRichSpout {
 		RobertBoschUtils.subscribeToSensorData();
 		
 		//establish database connection to device catalogue...will return a hashmap for datatype key and schema value (streetlight, streetlight schema etc)
-		RobertBoschUtils.queryCatalogurServer();
+		//RobertBoschUtils.queryCatalogurServer();
 		
 	}
 
