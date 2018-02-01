@@ -68,10 +68,17 @@ public class RobertBoschUtils implements MqttCallback {
 		props.setProperty("queuename", "database_queue");
 		props.setProperty("catalogue", "http://10.156.14.5:8001/cat");
 		//props.setProperty("catalogue", "https://smartcity.rbccps.org/api/0.1.0/cat");
+//		props.setProperty("protocompiler", "protoc");
+//		props.setProperty("protopath", "/Users/sahiltyagi/Desktop");
+//		props.setProperty("javapath", "/Users/sahiltyagi/Documents/IISc/protoschema/src/main/java");
+//		props.setProperty("maven", "/Users/sahiltyagi/Downloads/apache-maven-3.5.2/bin/mvn");
+//		props.setProperty("schemarepo", "/home/etl_subsystem/protoschema");
+		
+		//cluster config locations
 		props.setProperty("protocompiler", "protoc");
-		props.setProperty("protopath", "/Users/sahiltyagi/Desktop");
-		props.setProperty("javapath", "/Users/sahiltyagi/Documents/IISc/protoschema/src/main/java");
-		props.setProperty("maven", "/Users/sahiltyagi/Downloads/apache-maven-3.5.2/bin/mvn");
+		props.setProperty("protopath", "/home/etl_subsystem/protos");
+		props.setProperty("javapath", "/home/etl_subsystem/protoschema/src/main/java");
+		props.setProperty("maven", "mvn");
 		props.setProperty("schemarepo", "/home/etl_subsystem/protoschema");
 		
 	}
