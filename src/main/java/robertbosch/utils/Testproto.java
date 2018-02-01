@@ -16,7 +16,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import com.google.protobuf.util.JsonFormat;
-import com.protoTest.smartcity.Actuated;
+//import com.protoTest.smartcity.Actuated;
 
 public class Testproto {
 	

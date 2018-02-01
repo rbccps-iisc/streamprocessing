@@ -8,8 +8,8 @@ import java.util.concurrent.TimeoutException;
 
 import org.json.simple.JSONObject;
 
-import com.protoTest.smartcity.Pollut;
-import com.protoTest.smartcity.Sensed;
+//import com.protoTest.smartcity.Pollut;
+//import com.protoTest.smartcity.Sensed;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -63,14 +63,14 @@ public class SmartcityDataSimulator {
 		int batterylevel = ThreadLocalRandom.current().nextInt(0, 5001);
 		int dataSamplingInstant = ThreadLocalRandom.current().nextInt(10000000, 99999999);
 		
-		Sensed.sensor_values.Builder sensorval = Sensed.sensor_values.newBuilder();
-		sensorval.setLuxOutput(luxOutput);
-		sensorval.setPowerConsumption(powerconsumption);
-		sensorval.setCaseTemperature(casetemperature);
-		sensorval.setAmbientLux(ambientlux);
-		sensorval.setSlaveAlive(slaveAlive);
-		sensorval.setBatteryLevel(batterylevel);
-		sensorval.setDataSamplingInstant(dataSamplingInstant);
+//		Sensed.sensor_values.Builder sensorval = Sensed.sensor_values.newBuilder();
+//		sensorval.setLuxOutput(luxOutput);
+//		sensorval.setPowerConsumption(powerconsumption);
+//		sensorval.setCaseTemperature(casetemperature);
+//		sensorval.setAmbientLux(ambientlux);
+//		sensorval.setSlaveAlive(slaveAlive);
+//		sensorval.setBatteryLevel(batterylevel);
+//		sensorval.setDataSamplingInstant(dataSamplingInstant);
 		
 	}
 	
@@ -81,11 +81,11 @@ public class SmartcityDataSimulator {
 		int co2 = ThreadLocalRandom.current().nextInt(10, 50);
 		float noiselevel = ThreadLocalRandom.current().nextInt(0, 100);
 		
-		Pollut.pollution.Builder pollutiondata = Pollut.pollution.newBuilder();
-		pollutiondata.setPM25(pm25);
-		pollutiondata.setPM10(pm10);
-		pollutiondata.setCO2(co2);
-		pollutiondata.setNOISELEVEL(noiselevel);
+//		Pollut.pollution.Builder pollutiondata = Pollut.pollution.newBuilder();
+//		pollutiondata.setPM25(pm25);
+//		pollutiondata.setPM10(pm10);
+//		pollutiondata.setCO2(co2);
+//		pollutiondata.setNOISELEVEL(noiselevel);
 		
 	}
 	
@@ -166,7 +166,7 @@ public class SmartcityDataSimulator {
 	}
 	
 	public static void main(String[] args) {
-		RobertBoschUtils.getPublishChannel();
+		//RobertBoschUtils.getPublishChannel();
 		SmartcityDataSimulator obj = new SmartcityDataSimulator();
 		int iterations =10;
 		int index=0;
