@@ -64,20 +64,20 @@ public class Testproto {
 	
 	private static void readProtoData() {
 		
-		try {
-			Actuated.targetConfigurations confs = Actuated.targetConfigurations.parseFrom(new FileInputStream("/Users/sahiltyagi/Desktop/out1.txt"));
-//			Actuated.targetConfigurations confs = Actuated.targetConfigurations.parseFrom(data)
-//			System.out.println(confs.getPowerState().getTargetPowerState());
-//			System.out.println(confs.getControlPolicy().getControlPolicy());
-//			System.out.println(confs.getManualControlParams().getTargetBrightnessLevel());
-			
-			Object ob = Actuated.targetConfigurations.parseFrom(new FileInputStream("/Users/sahiltyagi/Desktop/out1.txt"));
-			String packet=JsonFormat.printer().print((Actuated.targetConfigurations)ob);
-			System.out.println(packet);
-			
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			Actuated.targetConfigurations confs = Actuated.targetConfigurations.parseFrom(new FileInputStream("/Users/sahiltyagi/Desktop/out1.txt"));
+////			Actuated.targetConfigurations confs = Actuated.targetConfigurations.parseFrom(data)
+////			System.out.println(confs.getPowerState().getTargetPowerState());
+////			System.out.println(confs.getControlPolicy().getControlPolicy());
+////			System.out.println(confs.getManualControlParams().getTargetBrightnessLevel());
+//			
+//			Object ob = Actuated.targetConfigurations.parseFrom(new FileInputStream("/Users/sahiltyagi/Desktop/out1.txt"));
+//			String packet=JsonFormat.printer().print((Actuated.targetConfigurations)ob);
+//			System.out.println(packet);
+//			
+//		} catch(IOException e) {
+//			e.printStackTrace();
+//		}
 	}
 	
 	private static void dynamicCompile() {
@@ -170,40 +170,40 @@ public class Testproto {
 	
 	private static void writeProtodata() {
 		
-//		Actuated.targetPowerStateParams.Builder powerstate = Actuated.targetPowerStateParams.newBuilder();
-//		powerstate.setTargetPowerState(true);
+////		Actuated.targetPowerStateParams.Builder powerstate = Actuated.targetPowerStateParams.newBuilder();
+////		powerstate.setTargetPowerState(true);
+////		
+////		Actuated.targetControlPolicy.Builder ctrlpolicy = Actuated.targetControlPolicy.newBuilder();
+////		ctrlpolicy.setControlPolicy(Actuated.ctrlPolicy.AUTO_LUX);
+////		
+////		Actuated.targetManualControlParams.Builder manualparams = Actuated.targetManualControlParams.newBuilder();
+////		manualparams.setTargetBrightnessLevel(99);
 //		
-//		Actuated.targetControlPolicy.Builder ctrlpolicy = Actuated.targetControlPolicy.newBuilder();
-//		ctrlpolicy.setControlPolicy(Actuated.ctrlPolicy.AUTO_LUX);
+//		Actuated.targetAutoTimerParams.Builder autotimers = Actuated.targetAutoTimerParams.newBuilder();
+//		autotimers.setTargetOnTime(60000);
+//		autotimers.setTargetOffTime(120000);
 //		
-//		Actuated.targetManualControlParams.Builder manualparams = Actuated.targetManualControlParams.newBuilder();
-//		manualparams.setTargetBrightnessLevel(99);
-		
-		Actuated.targetAutoTimerParams.Builder autotimers = Actuated.targetAutoTimerParams.newBuilder();
-		autotimers.setTargetOnTime(60000);
-		autotimers.setTargetOffTime(120000);
-		
-//		Actuated.targetAutoLuxParams.Builder autolux = Actuated.targetAutoLuxParams.newBuilder();
-//		autolux.setTargetOnLux(199);
-//		autolux.setTargetOffLux(299);
-		
-		Actuated.targetConfigurations.Builder confs = Actuated.targetConfigurations.newBuilder();
-//		confs.setPowerState(powerstate);
-//		confs.setControlPolicy(ctrlpolicy);
-//		confs.setManualControlParams(manualparams);
-		confs.setAutoTimerParams(autotimers);
-//		confs.setAutoLuxParams(autolux);
-		
-		Actuated.targetConfigurations finalconf = confs.build();
-		try {
-			
-			finalconf.writeTo(new FileOutputStream("/Users/sahiltyagi/Desktop/out1.txt"));
-			
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-		
-		System.out.println("done writing proto data to file");
+////		Actuated.targetAutoLuxParams.Builder autolux = Actuated.targetAutoLuxParams.newBuilder();
+////		autolux.setTargetOnLux(199);
+////		autolux.setTargetOffLux(299);
+//		
+//		Actuated.targetConfigurations.Builder confs = Actuated.targetConfigurations.newBuilder();
+////		confs.setPowerState(powerstate);
+////		confs.setControlPolicy(ctrlpolicy);
+////		confs.setManualControlParams(manualparams);
+//		confs.setAutoTimerParams(autotimers);
+////		confs.setAutoLuxParams(autolux);
+//		
+//		Actuated.targetConfigurations finalconf = confs.build();
+//		try {
+//			
+//			finalconf.writeTo(new FileOutputStream("/Users/sahiltyagi/Desktop/out1.txt"));
+//			
+//		} catch(IOException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		System.out.println("done writing proto data to file");
 	}
 	
 }

@@ -390,9 +390,9 @@ public class RobertBoschUtils implements MqttCallback {
 				String protobinary = jsonob.get("data").toString();
 				byte[] decode = Base64.getDecoder().decode(protobinary);
 				
-				Object o = Sensed.sensor_values.parseFrom(decode);
-				String packet=JsonFormat.printer().print((Sensed.sensor_values)o);
-				System.out.println("packet is:" + packet);
+//				Object o = Sensed.sensor_values.parseFrom(decode);
+//				String packet=JsonFormat.printer().print((Sensed.sensor_values)o);
+//				System.out.println("packet is:" + packet);
 				
 			}
 		}
