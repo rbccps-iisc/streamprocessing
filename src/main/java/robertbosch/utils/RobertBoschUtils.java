@@ -66,8 +66,8 @@ public class RobertBoschUtils implements MqttCallback {
 		props.setProperty("bindingkey", "*.#");
 		props.setProperty("virtualhost", "/");
 		props.setProperty("queuename", "database_queue");
-		props.setProperty("catalogue", "http://10.156.14.5:8001/cat");
-		//props.setProperty("catalogue", "https://smartcity.rbccps.org/api/0.1.0/cat");
+		//props.setProperty("catalogue", "http://10.156.14.5:8001/cat");
+		props.setProperty("catalogue", "https://smartcity.rbccps.org/api/0.1.0/cat");
 //		props.setProperty("protocompiler", "protoc");
 //		props.setProperty("protopath", "/Users/sahiltyagi/Desktop");
 //		props.setProperty("javapath", "/Users/sahiltyagi/Documents/IISc/protoschema/src/main/java");
