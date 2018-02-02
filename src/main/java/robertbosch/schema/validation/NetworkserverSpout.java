@@ -24,8 +24,8 @@ public class NetworkserverSpout extends BaseRichSpout {
 	private static final long serialVersionUID = 1L;
 	SpoutOutputCollector spoutcollector;
 	public static ConcurrentLinkedQueue<byte[]> loraserverqueue;
-	public static ConcurrentLinkedQueue<String> protoURLs;
-	public static ConcurrentHashMap<String, String> deviceprotoschema;
+	public static ConcurrentLinkedQueue<String> protoURLs = new ConcurrentLinkedQueue<String>();
+	public static ConcurrentHashMap<String, String> deviceprotoschema = new ConcurrentHashMap<String, String>();
 	Values values;
 	byte[] lorabinarydata, protobinary;
 	String loradata, protodata, deviceid;
@@ -61,8 +61,8 @@ public class NetworkserverSpout extends BaseRichSpout {
 		this.spoutcollector = arg2;
 		parser = new JSONParser();
 		loraserverqueue = new ConcurrentLinkedQueue<byte[]>();
-		deviceprotoschema = new ConcurrentHashMap<String, String>();
-		protoURLs = new ConcurrentLinkedQueue<String>();
+		//deviceprotoschema = new ConcurrentHashMap<String, String>();
+		//protoURLs = new ConcurrentLinkedQueue<String>();
 		RobertBoschUtils rbutils = new RobertBoschUtils();
 		rbutils.queryCatalogurServer();
 		rbutils.subscribeToNetworkServer();
