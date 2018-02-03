@@ -25,30 +25,25 @@ public class BOLTvalidator extends BaseRichBolt {
 	@Override
 	public void execute(Tuple arg0) {
 		// TODO Auto-generated method stub
-		try {
-			device = new String(arg0.getBinaryByField("deviceid"), "UTF-8");
-			data = arg0.getBinaryByField("protodata");
-			
-			if(!RobertBoschUtils.catalogue.contains(device)) {
-				utils.queryCatalogurServer();
-			}
-			
-			jsondata = ProtobufDeserializer.deserialize(data, NetworkserverSpout.deviceprotoschema.get(device).split("___")[0], 
-												NetworkserverSpout.deviceprotoschema.get(device).split("___")[1]);
-			System.out.println("###$$$*** data is: " + jsondata);
-			
-//			try {
-//				
-//				RobertBoschUtils.publishchannel.queueDeclare(RobertBoschUtils.pubTopic, false, false, false, null);
-//				RobertBoschUtils.publishchannel.basicPublish("", RobertBoschUtils.pubTopic, null, jsondata.getBytes());
-//				
-//			} catch(IOException e) {
-//				e.printStackTrace();
-//			}
-			
-		} catch(UnsupportedEncodingException e) {
-			e.printStackTrace();
+		device = arg0.getStringByField("deviceid");
+		data = arg0.getBinaryByField("protodata");
+		
+		if(!RobertBoschUtils.catalogue.contains(device)) {
+			utils.queryCatalogurServer();
 		}
+		
+		jsondata = ProtobufDeserializer.deserialize(data, NetworkserverSpout.deviceprotoschema.get(device).split("___")[0], 
+											NetworkserverSpout.deviceprotoschema.get(device).split("___")[1]);
+		System.out.println("#################################$$$******************%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% data is: " + jsondata);
+		
+//		try {
+//			
+//			RobertBoschUtils.publishchannel.queueDeclare(RobertBoschUtils.pubTopic, false, false, false, null);
+//			RobertBoschUtils.publishchannel.basicPublish("", RobertBoschUtils.pubTopic, null, jsondata.getBytes());
+//			
+//		} catch(IOException e) {
+//			e.printStackTrace();
+//		}
 		
 	}
 

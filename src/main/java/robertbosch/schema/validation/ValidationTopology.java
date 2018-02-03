@@ -19,7 +19,7 @@ public class ValidationTopology {
 		
 		cluster.submitTopology("Validation Server", config, builder.createTopology());
 		try {
-			Thread.sleep(100000);
+			Thread.sleep(1000000000);
 		} catch(InterruptedException e) {
 			e.printStackTrace();
 		}

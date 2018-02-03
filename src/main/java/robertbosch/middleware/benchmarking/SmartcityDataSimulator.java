@@ -1,6 +1,9 @@
 package robertbosch.middleware.benchmarking;
 
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.UUID;
 //import java.io.IOException;
 import java.util.concurrent.ThreadLocalRandom;
@@ -8,8 +11,8 @@ import java.util.concurrent.TimeoutException;
 
 import org.json.simple.JSONObject;
 
-//import com.protoTest.smartcity.Pollut;
-//import com.protoTest.smartcity.Sensed;
+import com.protoTest.smartcity.Pollut;
+import com.protoTest.smartcity.Sensed;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -18,6 +21,8 @@ import robertbosch.utils.RobertBoschUtils;
 
 public class SmartcityDataSimulator {
 	JSONObject data = null;
+	static Channel channel;
+	static BufferedWriter publish;
 	
 	private void jsonstreetLight() {
 		
@@ -31,6 +36,7 @@ public class SmartcityDataSimulator {
 		int dataSamplingInstant = ThreadLocalRandom.current().nextInt(10000000, 99999999);
 		
 		data = new JSONObject();
+		//data.put("devEUI", "streetlight-" + UUID.randomUUID().toString());
 		data.put("luxOutput", luxOutput);
 		data.put("powerConsumption", powerconsumption);
 		data.put("caseTemperature", casetemperature);
@@ -41,15 +47,24 @@ public class SmartcityDataSimulator {
 		
 		String deviceId = "streetlight-" + UUID.randomUUID().toString();
 		
-		String packet = "[\"key\": \"" + deviceId + "\"," + data.toJSONString() + "]";
-		System.out.println(packet);
+		JSONObject finalobj = new JSONObject();
+		finalobj.put("devEUI", deviceId);
+		finalobj.put("data", data);
 		
-//		try {
-//			RobertBoschUtils.publishchannel.queueDeclare("simulator", false, false, false, null);
-//			RobertBoschUtils.publishchannel.basicPublish("", RobertBoschUtils.pubTopic, null, packet.getBytes());
-//		} catch(IOException e) {
-//			e.printStackTrace();
-//		}
+		//String packet = "[\"key\": \"" + deviceId + "\"," + data.toJSONString() + "]";
+		//String packet = "{\"devEUI\": \"" + deviceId + "\",\"data\": \"" + data.toJSONString() + "\"}";
+		String packet = finalobj.toJSONString();
+		//System.out.println(packet);
+		
+		try {
+			String device = "sahil";
+			channel.queueDeclare("simulator", false, false, false, null);
+			channel.basicPublish("", device, null, packet.getBytes());
+			publish.write(System.currentTimeMillis() + "," + deviceId + "\n");
+			
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void protostreetlight() {
@@ -63,14 +78,14 @@ public class SmartcityDataSimulator {
 		int batterylevel = ThreadLocalRandom.current().nextInt(0, 5001);
 		int dataSamplingInstant = ThreadLocalRandom.current().nextInt(10000000, 99999999);
 		
-//		Sensed.sensor_values.Builder sensorval = Sensed.sensor_values.newBuilder();
-//		sensorval.setLuxOutput(luxOutput);
-//		sensorval.setPowerConsumption(powerconsumption);
-//		sensorval.setCaseTemperature(casetemperature);
-//		sensorval.setAmbientLux(ambientlux);
-//		sensorval.setSlaveAlive(slaveAlive);
-//		sensorval.setBatteryLevel(batterylevel);
-//		sensorval.setDataSamplingInstant(dataSamplingInstant);
+		Sensed.sensor_values.Builder sensorval = Sensed.sensor_values.newBuilder();
+		sensorval.setLuxOutput(luxOutput);
+		sensorval.setPowerConsumption(powerconsumption);
+		sensorval.setCaseTemperature(casetemperature);
+		sensorval.setAmbientLux(ambientlux);
+		sensorval.setSlaveAlive(slaveAlive);
+		sensorval.setBatteryLevel(batterylevel);
+		sensorval.setDataSamplingInstant(dataSamplingInstant);
 		
 	}
 	
@@ -81,11 +96,11 @@ public class SmartcityDataSimulator {
 		int co2 = ThreadLocalRandom.current().nextInt(10, 50);
 		float noiselevel = ThreadLocalRandom.current().nextInt(0, 100);
 		
-//		Pollut.pollution.Builder pollutiondata = Pollut.pollution.newBuilder();
-//		pollutiondata.setPM25(pm25);
-//		pollutiondata.setPM10(pm10);
-//		pollutiondata.setCO2(co2);
-//		pollutiondata.setNOISELEVEL(noiselevel);
+		Pollut.pollution.Builder pollutiondata = Pollut.pollution.newBuilder();
+		pollutiondata.setPM25(pm25);
+		pollutiondata.setPM10(pm10);
+		pollutiondata.setCO2(co2);
+		pollutiondata.setNOISELEVEL(noiselevel);
 		
 	}
 	
@@ -143,7 +158,7 @@ public class SmartcityDataSimulator {
 		System.out.println(packet);
 	}
 	
-	private static Channel createbrokerChannel(String deviceId) {
+	private Channel createbrokerChannel(String deviceId) {
 		
 		ConnectionFactory connfac = new ConnectionFactory();
 		connfac.setHost("10.156.14.6");
@@ -165,9 +180,14 @@ public class SmartcityDataSimulator {
 		return channel;
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		//RobertBoschUtils.getPublishChannel();
 		SmartcityDataSimulator obj = new SmartcityDataSimulator();
+		channel = obj.createbrokerChannel("sahil");
+		
+		String publishfile = "/Users/sahiltyagi/Desktop/publish.txt";
+		publish = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(publishfile)));
+		
 		int iterations =10;
 		int index=0;
 		while(index<iterations) {
@@ -176,6 +196,7 @@ public class SmartcityDataSimulator {
 			index++;
 		}
 		
+		publish.close();
 		System.out.println("complete.");
 	}
 }

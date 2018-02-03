@@ -66,20 +66,22 @@ public class RobertBoschUtils implements MqttCallback {
 		props.setProperty("bindingkey", "*.#");
 		props.setProperty("virtualhost", "/");
 		props.setProperty("queuename", "database_queue");
-		//props.setProperty("catalogue", "http://10.156.14.5:8001/cat");
-		props.setProperty("catalogue", "https://smartcity.rbccps.org/api/0.1.0/cat");
-//		props.setProperty("protocompiler", "protoc");
-//		props.setProperty("protopath", "/Users/sahiltyagi/Desktop");
-//		props.setProperty("javapath", "/Users/sahiltyagi/Documents/IISc/protoschema/src/main/java");
-//		props.setProperty("maven", "/Users/sahiltyagi/Downloads/apache-maven-3.5.2/bin/mvn");
-//		props.setProperty("schemarepo", "/home/etl_subsystem/protoschema");
+		props.setProperty("catalogue", "http://10.156.14.5:8001/cat");
+		//props.setProperty("catalogue", "https://smartcity.rbccps.org/api/0.1.0/cat");
 		
-		//cluster config locations
+		//local test config
 		props.setProperty("protocompiler", "protoc");
-		props.setProperty("protopath", "/home/etl_subsystem/protos");
-		props.setProperty("javapath", "/home/etl_subsystem/protoschema/src/main/java");
-		props.setProperty("maven", "mvn");
-		props.setProperty("schemarepo", "/home/etl_subsystem/protoschema");
+		props.setProperty("protopath", "/Users/sahiltyagi/Desktop");
+		props.setProperty("javapath", "/Users/sahiltyagi/Documents/IISc/protoschema/src/main/java");
+		props.setProperty("maven", "/Users/sahiltyagi/Downloads/apache-maven-3.5.2/bin/mvn");
+		props.setProperty("schemarepo", "/Users/sahiltyagi/Documents/IISc/protoschema");
+		
+		//cluster config
+//		props.setProperty("protocompiler", "protoc");
+//		props.setProperty("protopath", "/home/etl_subsystem/protos");
+//		props.setProperty("javapath", "/home/etl_subsystem/protoschema/src/main/java");
+//		props.setProperty("maven", "mvn");
+//		props.setProperty("schemarepo", "/home/etl_subsystem/protoschema");
 		
 	}
 	
@@ -316,17 +318,17 @@ public class RobertBoschUtils implements MqttCallback {
 				System.out.println(devId);
 				
 				//establish one broker client per device. Total number of rabbitmq clients is equal to the size of the catalogue hashmap
-				if(!NetworkserverSpout.deviceprotoschema.containsKey(devId)) {
-					
-					String schema = itemobj.get("data_schema").toString();
-					catalogue.put(devId, schema);
-					
-					obj = parse.parse(itemobj.get("serialization_from_device").toString());
-					jsonobj = (JSONObject)obj;
-					
-					NetworkserverSpout.protoURLs.add(jsonobj.get("link").toString());
-					NetworkserverSpout.deviceprotoschema.put(devId, jsonobj.get("mainMessageName").toString() + "___" + jsonobj.get("link").toString());
-				}
+//				if(!NetworkserverSpout.deviceprotoschema.containsKey(devId)) {
+//					
+//					String schema = itemobj.get("data_schema").toString();
+//					catalogue.put(devId, schema);
+//					
+//					obj = parse.parse(itemobj.get("serialization_from_device").toString());
+//					jsonobj = (JSONObject)obj;
+//					
+//					NetworkserverSpout.protoURLs.add(jsonobj.get("link").toString());
+//					NetworkserverSpout.deviceprotoschema.put(devId, jsonobj.get("mainMessageName").toString() + "___" + jsonobj.get("link").toString());
+//				}
 				
 			}
 			
@@ -382,26 +384,28 @@ public class RobertBoschUtils implements MqttCallback {
 	public static void main(String[] args) throws Exception {
 		System.out.println("starting...");
 		RobertBoschUtils rb = new RobertBoschUtils();
-		rb.subscribeToNetworkServer();
-		System.out.println("subscribed to n/w server...");
-		while(true) {
-			if(arrtest.size() > 0) {
-				
-				byte[] data = arrtest.poll();
-				String loradata = new String(data, StandardCharsets.UTF_8);
-				System.out.println("final data: " + loradata);
-				JSONParser parser = new JSONParser();
-				Object obj = parser.parse(loradata);
-				JSONObject jsonob = (JSONObject)obj;
-				String protobinary = jsonob.get("data").toString();
-				byte[] decode = Base64.getDecoder().decode(protobinary);
-				
-//				Object o = Sensed.sensor_values.parseFrom(decode);
-//				String packet=JsonFormat.printer().print((Sensed.sensor_values)o);
-//				System.out.println("packet is:" + packet);
-				
-			}
-		}
+//		rb.subscribeToNetworkServer();
+//		System.out.println("subscribed to n/w server...");
+//		while(true) {
+//			if(arrtest.size() > 0) {
+//				
+//				byte[] data = arrtest.poll();
+//				String loradata = new String(data, StandardCharsets.UTF_8);
+//				System.out.println("final data: " + loradata);
+//				JSONParser parser = new JSONParser();
+//				Object obj = parser.parse(loradata);
+//				JSONObject jsonob = (JSONObject)obj;
+//				String protobinary = jsonob.get("data").toString();
+//				byte[] decode = Base64.getDecoder().decode(protobinary);
+//				
+////				Object o = Sensed.sensor_values.parseFrom(decode);
+////				String packet=JsonFormat.printer().print((Sensed.sensor_values)o);
+////				System.out.println("packet is:" + packet);
+//				
+//			}
+//		}
+		
+		rb.queryCatalogurServer();
 		
 	}
 
@@ -420,8 +424,9 @@ public class RobertBoschUtils implements MqttCallback {
 	@Override
 	public void messageArrived(String arg0, MqttMessage arg1) throws Exception {
 		// TODO Auto-generated method stub
-		arrtest.add(arg1.getPayload());
-		//NetworkserverSpout.loraserverqueue.add(arg1.getPayload());
+		byte[] msg = arg1.getPayload();
+		NetworkserverSpout.loraserverqueue.add(msg);
+		arrtest.add(msg);
 		
 	}
 	

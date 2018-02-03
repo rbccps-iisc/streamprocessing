@@ -23,7 +23,7 @@ public class NetworkserverSpout extends BaseRichSpout {
 
 	private static final long serialVersionUID = 1L;
 	SpoutOutputCollector spoutcollector;
-	public static ConcurrentLinkedQueue<byte[]> loraserverqueue;
+	public static ConcurrentLinkedQueue<byte[]> loraserverqueue = new ConcurrentLinkedQueue<byte[]>();
 	public static ConcurrentLinkedQueue<String> protoURLs = new ConcurrentLinkedQueue<String>();
 	public static ConcurrentHashMap<String, String> deviceprotoschema = new ConcurrentHashMap<String, String>();
 	Values values;
@@ -38,14 +38,15 @@ public class NetworkserverSpout extends BaseRichSpout {
 		// TODO Auto-generated method stub
 		try {
 			if(loraserverqueue != null && loraserverqueue.size() >0) {
-				
+				System.out.println("................................................................entered into the condition");
 				lorabinarydata = loraserverqueue.poll();
 				loradata = new String(lorabinarydata, StandardCharsets.UTF_8);
+				System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ lora data is: " + loradata);
 				obj = parser.parse(loradata);
 				jsonob = (JSONObject)obj;
 				deviceid = jsonob.get("devEUI").toString();
 				protodata = jsonob.get("data").toString();
-				protobinary = Base64.getDecoder().decode(protobinary);
+				protobinary = Base64.getDecoder().decode(protodata);
 				values = new Values(deviceid, protobinary);
 				spoutcollector.emit(values);
 				
@@ -60,12 +61,13 @@ public class NetworkserverSpout extends BaseRichSpout {
 		// TODO Auto-generated method stub
 		this.spoutcollector = arg2;
 		parser = new JSONParser();
-		loraserverqueue = new ConcurrentLinkedQueue<byte[]>();
+		//loraserverqueue = new ConcurrentLinkedQueue<byte[]>();
 		//deviceprotoschema = new ConcurrentHashMap<String, String>();
 		//protoURLs = new ConcurrentLinkedQueue<String>();
 		RobertBoschUtils rbutils = new RobertBoschUtils();
 		rbutils.queryCatalogurServer();
 		rbutils.subscribeToNetworkServer();
+		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ subscribed to network server");
 		
 	}
 

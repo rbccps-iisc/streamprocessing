@@ -1,10 +1,12 @@
 robertbosch/utils/RobertBoschUtils.class
-robertbosch/middleware/benchmarking/StreetlightSimulator.class
-robertbosch/utils/RobertBoschUtils$2.class
+robertbosch/middleware/benchmarking/SmartcityDataSimulator.class
+robertbosch/utils/ProtobufDeserializer.class
+robertbosch/schema/validation/NetworkserverSpout.class
 robertbosch/schema/validation/SchemaBrokerSpout.class
 robertbosch/schema/validation/ValidationTopology.class
 robertbosch/App.class
 robertbosch/utils/Testclass.class
+robertbosch/schema/validation/BOLTvalidator.class
 robertbosch/utils/RobertBoschUtils$1.class
 robertbosch/utils/Testproto.class
 robertbosch/schema/validation/SchemaVerifyBolt.class
