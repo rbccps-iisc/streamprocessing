@@ -2,7 +2,9 @@ package robertbosch.schema.validation;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -14,13 +16,14 @@ import org.apache.storm.tuple.Tuple;
 import robertbosch.utils.ProtobufDeserializer;
 import robertbosch.utils.RobertBoschUtils;
 
-public class BOLTvalidator extends BaseRichBolt {
+public class ProtoConversionBolt extends BaseRichBolt {
 
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
 	String device, jsondata;
 	byte[] data;
 	private RobertBoschUtils utils;
+	public static Set<String> protoURLs;
 	
 	@Override
 	public void execute(Tuple arg0) {
@@ -64,6 +67,7 @@ public class BOLTvalidator extends BaseRichBolt {
 		this.outputCollector = arg2;
 		utils = new RobertBoschUtils();
 		utils.getPublishChannel();
+		protoURLs = new HashSet<String>();
 	}
 
 	@Override

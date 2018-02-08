@@ -24,7 +24,7 @@ public class NetworkserverSpout extends BaseRichSpout {
 	private static final long serialVersionUID = 1L;
 	SpoutOutputCollector spoutcollector;
 	public static ConcurrentLinkedQueue<byte[]> loraserverqueue = new ConcurrentLinkedQueue<byte[]>();
-	public static ConcurrentLinkedQueue<String> protoURLs = new ConcurrentLinkedQueue<String>();
+	//public static ConcurrentLinkedQueue<String> protoURLs = new ConcurrentLinkedQueue<String>();
 	public static ConcurrentHashMap<String, String> deviceprotoschema = new ConcurrentHashMap<String, String>();
 	Values values;
 	byte[] lorabinarydata, protobinary;

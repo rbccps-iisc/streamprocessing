@@ -13,6 +13,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import robertbosch.schema.validation.NetworkserverSpout;
+import robertbosch.schema.validation.ProtoConversionBolt;
 import robertbosch.schema.validation.SchemaVerifyBolt;
 
 public class ProtobufDeserializer {
@@ -66,6 +67,12 @@ public class ProtobufDeserializer {
 			builder.directory(new File(RobertBoschUtils.props.getProperty("schemarepo")));
 			proc = builder.start();
 			waitime = proc.waitFor();
+			//cluster config
+			//comment out when running locally
+			builder = new ProcessBuilder("mv", "/home/etl_subsystem/protoschema/target/protoschema-1.0-SNAPSHOT-jar-with-dependencies.jar", 
+										"/home/etl_subsystem/apache-storm-1.0.2/lib/");
+			proc = builder.start();
+			waitime = proc.waitFor();
 			System.out.println("...................................................... generated protobuf classes");
 			
 		} catch(MalformedURLException urlex) {
@@ -80,12 +87,12 @@ public class ProtobufDeserializer {
 	public static String deserialize(byte[] buffer, String message, String url) {
 		//if list in supervisor task does not contain proto file name (uppercase), then run  generateProtobufClasses(url method), followed by deserializer method
 		//otherwise, run deserializer method ONLY
-		if(!NetworkserverSpout.protoURLs.contains(url)) {
-			System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ going to generate protobuf classes");
+		if(!ProtoConversionBolt.protoURLs.contains(url)) {
+			System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ going to generate protobuff classes");
 			generateProtobufClasses(url);
-			NetworkserverSpout.protoURLs.add(url);
+			ProtoConversionBolt.protoURLs.add(url);
 		} else {
-			System.out.println("NOT GOING TO GENERATE PROTO CLASSES@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+			System.out.println("NOT GOING TO GENERATE PROTO CLASSES @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 		}
 		
 		String protofile= url.split("/")[url.split("/").length -1].split(".proto")[0];
