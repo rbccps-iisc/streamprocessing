@@ -37,7 +37,8 @@ public class NetworkserverSpout extends BaseRichSpout {
 	public void nextTuple() {
 		// TODO Auto-generated method stub
 		try {
-			if(loraserverqueue != null && loraserverqueue.size() >0) {
+			//if(loraserverqueue != null && loraserverqueue.size() >0) {
+			if(loraserverqueue.size() >0) {
 				System.out.println("................................................................entered into the condition");
 				lorabinarydata = loraserverqueue.poll();
 				loradata = new String(lorabinarydata, StandardCharsets.UTF_8);
@@ -65,7 +66,7 @@ public class NetworkserverSpout extends BaseRichSpout {
 		//deviceprotoschema = new ConcurrentHashMap<String, String>();
 		//protoURLs = new ConcurrentLinkedQueue<String>();
 		RobertBoschUtils rbutils = new RobertBoschUtils();
-		rbutils.queryCatalogurServer();
+		rbutils.queryCatalogueServer();
 		rbutils.subscribeToNetworkServer();
 		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ subscribed to network server");
 		

@@ -52,9 +52,12 @@ public class Testproto {
 //		System.out.println("done waiting for compiling");
 //		checkprotoJAR();
 		
-		System.out.println("test rabbitmq subscriber...");
-		subscriberabbitMQ(10);
-		System.out.println("done with test proto code...");
+//		System.out.println("test rabbitmq subscriber...");
+//		subscriberabbitMQ(1000);
+//		System.out.println("done with test proto code...");
+		
+		String url = "https://raw.githubusercontent.com/mukuntharun/flowsensor/master/protos/sensed.proto";
+		System.out.println(RobertBoschUtils.protofiles + url.split("/")[url.split("/").length -1]);
 		
 	}
 	

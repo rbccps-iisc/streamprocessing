@@ -17,16 +17,41 @@ import robertbosch.schema.validation.SchemaVerifyBolt;
 
 public class ProtobufDeserializer {
 	
+//	public static void main(String[] args) {
+//		//String url = "https://raw.githubusercontent.com/mukuntharun/flowsensor/master/protos/sensed.proto";
+//		String url = "https://raw.githubusercontent.com/rbccps-iisc/applications-streetlight/master/proto_stm/txmsg/sensed.proto";
+//		generateProtobufClasses(url);
+//	}
+	
 	private static void generateProtobufClasses(String url) {
 		try {
+			System.out.println("reading url...");
 			URL link = new URL(url);
 			BufferedReader rdr = new BufferedReader(new InputStreamReader(link.openStream()));
-			String proto;
+			String proto, entirestring ="";
 			String protofile = RobertBoschUtils.protofiles + url.split("/")[url.split("/").length -1];
 			BufferedWriter bfrwrtr = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(protofile)));
+			boolean proto2syntax =true;
 			
 			while((proto = rdr.readLine()) != null) {
-				bfrwrtr.write(proto+"\n");
+				
+				entirestring += proto + "\n";
+				
+				if(entirestring.startsWith("syntax=\"proto2\";\n")) {
+					bfrwrtr.write(proto+"\n");
+					if(proto2syntax) {
+						bfrwrtr.write("option java_package= \"com.protoTest.smartcity\";\n");
+						proto2syntax=false;
+					}
+				} else {
+					if(proto2syntax) {
+						bfrwrtr.write("option java_package= \"com.protoTest.smartcity\";\n");
+						proto2syntax=false;
+					}
+					
+					bfrwrtr.write(proto+"\n");
+				}
+				
 			}
 			rdr.close();
 			bfrwrtr.close();
@@ -41,6 +66,7 @@ public class ProtobufDeserializer {
 			builder.directory(new File(RobertBoschUtils.props.getProperty("schemarepo")));
 			proc = builder.start();
 			waitime = proc.waitFor();
+			System.out.println("...................................................... generated protobuf classes");
 			
 		} catch(MalformedURLException urlex) {
 			urlex.printStackTrace();
@@ -55,11 +81,19 @@ public class ProtobufDeserializer {
 		//if list in supervisor task does not contain proto file name (uppercase), then run  generateProtobufClasses(url method), followed by deserializer method
 		//otherwise, run deserializer method ONLY
 		if(!NetworkserverSpout.protoURLs.contains(url)) {
+			System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ going to generate protobuf classes");
 			generateProtobufClasses(url);
+			NetworkserverSpout.protoURLs.add(url);
+		} else {
+			System.out.println("NOT GOING TO GENERATE PROTO CLASSES@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 		}
 		
-		String protofile= RobertBoschUtils.protofiles + url.split("/")[url.split("/").length -1].split(".")[0];
-		String mainclass = protofile.substring(0, 1).toUpperCase() + protofile.substring(1);
+		String protofile= url.split("/")[url.split("/").length -1].split(".proto")[0];
+		String mainclass= protofile.substring(0, 1).toUpperCase() + protofile.substring(1);
+		
+		if(mainclass.equalsIgnoreCase(message)) {
+			mainclass = mainclass + "OuterClass";
+		}
 		
 		Object data=null;
 		try {

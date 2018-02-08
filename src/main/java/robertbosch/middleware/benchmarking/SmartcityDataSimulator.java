@@ -9,8 +9,15 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeoutException;
 
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.simple.JSONObject;
 
+import com.google.protobuf.util.JsonFormat;
 import com.protoTest.smartcity.Pollut;
 import com.protoTest.smartcity.Sensed;
 import com.rabbitmq.client.Channel;
@@ -19,10 +26,11 @@ import com.rabbitmq.client.ConnectionFactory;
 
 import robertbosch.utils.RobertBoschUtils;
 
-public class SmartcityDataSimulator {
+public class SmartcityDataSimulator implements MqttCallback {
 	JSONObject data = null;
 	static Channel channel;
 	static BufferedWriter publish;
+	static MqttMessage mqttpub = new MqttMessage();
 	
 	private void jsonstreetLight() {
 		
@@ -67,8 +75,9 @@ public class SmartcityDataSimulator {
 		}
 	}
 	
-	private void protostreetlight() {
+	private void protostreetlight() throws Exception {
 		
+		SmartcityDataSimulator simulator = new SmartcityDataSimulator();
 		boolean[] state = {true, false};
 		int luxOutput = ThreadLocalRandom.current().nextInt(100, 1001);
 		int powerconsumption = ThreadLocalRandom.current().nextInt(0, 101);
@@ -86,6 +95,18 @@ public class SmartcityDataSimulator {
 		sensorval.setSlaveAlive(slaveAlive);
 		sensorval.setBatteryLevel(batterylevel);
 		sensorval.setDataSamplingInstant(dataSamplingInstant);
+		
+		byte[] snsr = sensorval.build().toByteArray();
+		JSONObject ob = new JSONObject();
+		ob.put("devEUI", "70b3d58ff0031f00");
+		ob.put("data", snsr);
+		
+//		System.out.println(ob.toJSONString());
+//		Object o = Sensed.sensor_values.parseFrom(snsr);
+//		String packet=JsonFormat.printer().print((Sensed.sensor_values)o);
+//		System.out.println("packet is:" + packet);
+		
+		simulator.publishToNetworkServer(ob.toJSONString().getBytes());
 		
 	}
 	
@@ -180,23 +201,66 @@ public class SmartcityDataSimulator {
 		return channel;
 	}
 	
-	public static void main(String[] args) throws IOException {
+	private void publishToNetworkServer(byte[] data) {
+		MqttConnectOptions connection = new MqttConnectOptions();
+		connection.setAutomaticReconnect(true);
+		connection.setCleanSession(false);
+		connection.setConnectionTimeout(30);
+		connection.setUserName("loraserver");
+		connection.setPassword("loraserver".toCharArray());
+		
+		try {
+			MqttClient client = new MqttClient("tcp://gateways.rbccps.org:1883", MqttClient.generateClientId());
+			client.setCallback(this);
+			client.connect(connection);
+			
+			mqttpub = new MqttMessage();
+			mqttpub.setQos(2);
+			mqttpub.setPayload(data);
+			client.publish("sahil1", mqttpub);
+			
+		} catch(MqttException m) {
+			m.printStackTrace();
+		}
+
+	}
+	
+	public static void main(String[] args) throws Exception {
 		//RobertBoschUtils.getPublishChannel();
 		SmartcityDataSimulator obj = new SmartcityDataSimulator();
-		channel = obj.createbrokerChannel("sahil");
+		//channel = obj.createbrokerChannel("sahil");
 		
-		String publishfile = "/Users/sahiltyagi/Desktop/publish.txt";
-		publish = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(publishfile)));
+//		String publishfile = "/Users/sahiltyagi/Desktop/publish.txt";
+//		publish = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(publishfile)));
 		
-		int iterations =10;
+		int iterations =1;
 		int index=0;
 		while(index<iterations) {
-			obj.jsonstreetLight();
+			//obj.jsonstreetLight();
+			obj.protostreetlight();
 			//obj.jsonenergyMeter();
 			index++;
 		}
 		
 		publish.close();
 		System.out.println("complete.");
+	}
+
+	@Override
+	public void connectionLost(Throwable arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deliveryComplete(IMqttDeliveryToken arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void messageArrived(String arg0, MqttMessage arg1) throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 }

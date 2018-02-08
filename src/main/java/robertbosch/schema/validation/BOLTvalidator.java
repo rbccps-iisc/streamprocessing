@@ -27,23 +27,34 @@ public class BOLTvalidator extends BaseRichBolt {
 		// TODO Auto-generated method stub
 		device = arg0.getStringByField("deviceid");
 		data = arg0.getBinaryByField("protodata");
+		System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ device id is:" + device);
+		System.out.println("%%%%%%%%%%%%%%%%%%  key set of protoschema map:" + NetworkserverSpout.deviceprotoschema.keySet());
 		
-		if(!RobertBoschUtils.catalogue.contains(device)) {
-			utils.queryCatalogurServer();
+		if(data != null) {
+			
+			if(!RobertBoschUtils.catalogue.contains(device)) {
+				System.out.println("###################### querying catalogue from the bolt validator......................");
+				utils.queryCatalogueServer();
+			}
+			
+			System.out.println("******************** link: " + NetworkserverSpout.deviceprotoschema.get(device).split("___")[0]);
+			System.out.println("~~~~~~~~~~~~~~~~~~~~ mainmessage: " + NetworkserverSpout.deviceprotoschema.get(device).split("___")[1]);
+			//deserialize(byte[] buffer, String message, String url)
+			//url__message
+			jsondata = ProtobufDeserializer.deserialize(data, NetworkserverSpout.deviceprotoschema.get(device).split("___")[1], 
+												NetworkserverSpout.deviceprotoschema.get(device).split("___")[0]);
+			System.out.println("#################################$$$******************%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% data is: " + jsondata);
+			
+//			try {
+//				
+//				RobertBoschUtils.publishchannel.queueDeclare(RobertBoschUtils.pubTopic, false, false, false, null);
+//				RobertBoschUtils.publishchannel.basicPublish("", RobertBoschUtils.pubTopic, null, jsondata.getBytes());
+//				
+//			} catch(IOException e) {
+//				e.printStackTrace();
+//			}
+			
 		}
-		
-		jsondata = ProtobufDeserializer.deserialize(data, NetworkserverSpout.deviceprotoschema.get(device).split("___")[0], 
-											NetworkserverSpout.deviceprotoschema.get(device).split("___")[1]);
-		System.out.println("#################################$$$******************%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% data is: " + jsondata);
-		
-//		try {
-//			
-//			RobertBoschUtils.publishchannel.queueDeclare(RobertBoschUtils.pubTopic, false, false, false, null);
-//			RobertBoschUtils.publishchannel.basicPublish("", RobertBoschUtils.pubTopic, null, jsondata.getBytes());
-//			
-//		} catch(IOException e) {
-//			e.printStackTrace();
-//		}
 		
 	}
 
