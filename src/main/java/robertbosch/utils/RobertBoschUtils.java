@@ -37,7 +37,7 @@ import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.google.protobuf.util.JsonFormat;
-import com.protoTest.smartcity.Sensed;
+//import com.protoTest.smartcity.Sensed;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -54,8 +54,8 @@ public class RobertBoschUtils implements MqttCallback {
 	public static ConcurrentHashMap<String, String> catalogue = new ConcurrentHashMap<String, String>();
 	private static List<String> list;
 	public static Channel publishchannel;
-	//public static String pubTopic = "valid_data", protofiles = "/home/etl_subsystem/protos/";
-	public static String pubTopic = "valid_data", protofiles = "/Users/sahiltyagi/Desktop/protos/";
+	public static String pubTopic = "valid_data", protofiles = "/home/etl_subsystem/protos/";
+	//public static String pubTopic = "valid_data", protofiles = "/Users/sahiltyagi/Desktop/protos/";
 	
 	static {
 		
@@ -71,18 +71,18 @@ public class RobertBoschUtils implements MqttCallback {
 		//props.setProperty("catalogue", "https://smartcity.rbccps.org/api/0.1.0/cat");
 		
 		//local test config
-		props.setProperty("protocompiler", "/usr/local/bin/protoc");
-		props.setProperty("protopath", "/Users/sahiltyagi/Desktop");
-		props.setProperty("javapath", "/Users/sahiltyagi/Documents/IISc/protoschema/src/main/java");
-		props.setProperty("maven", "/Users/sahiltyagi/Downloads/apache-maven-3.5.2/bin/mvn");
-		props.setProperty("schemarepo", "/Users/sahiltyagi/Documents/IISc/protoschema");
+//		props.setProperty("protocompiler", "/usr/local/bin/protoc");
+//		props.setProperty("protopath", "/Users/sahiltyagi/Desktop");
+//		props.setProperty("javapath", "/Users/sahiltyagi/Documents/IISc/protoschema/src/main/java");
+//		props.setProperty("maven", "/Users/sahiltyagi/Downloads/apache-maven-3.5.2/bin/mvn");
+//		props.setProperty("schemarepo", "/Users/sahiltyagi/Documents/IISc/protoschema");
 		
 		//cluster config
-//		props.setProperty("protocompiler", "protoc");
-//		props.setProperty("protopath", "/home/etl_subsystem/protos");
-//		props.setProperty("javapath", "/home/etl_subsystem/protoschema/src/main/java");
-//		props.setProperty("maven", "mvn");
-//		props.setProperty("schemarepo", "/home/etl_subsystem/protoschema");
+		props.setProperty("protocompiler", "/usr/local/bin/protoc");
+		props.setProperty("protopath", "/home/etl_subsystem/protos");
+		props.setProperty("javapath", "/home/etl_subsystem/protoschema/src/main/java");
+		props.setProperty("maven", "/usr/bin/mvn");
+		props.setProperty("schemarepo", "/home/etl_subsystem/protoschema");
 		
 	}
 	
