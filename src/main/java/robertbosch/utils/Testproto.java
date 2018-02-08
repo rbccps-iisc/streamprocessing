@@ -66,7 +66,7 @@ public class Testproto {
 		JSONParser parser = new JSONParser();
 		RobertBoschUtils rb = new RobertBoschUtils();
 		try {
-			BufferedWriter subscriber = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(subscribefile)));
+			final BufferedWriter subscriber = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(subscribefile)));
 			
 			ConnectionFactory factory = new ConnectionFactory();
 			factory.setHost(RobertBoschUtils.props.getProperty("host"));
