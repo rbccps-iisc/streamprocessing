@@ -69,7 +69,7 @@ public class ProtobufDeserializer {
 			waitime = proc.waitFor();
 			//cluster config
 			//comment out when running locally
-			builder = new ProcessBuilder("mv", "/home/etl_subsystem/protoschema/target/protoschema-1.0-SNAPSHOT-jar-with-dependencies.jar", 
+			builder = new ProcessBuilder("cp", "/home/etl_subsystem/protoschema/target/protoschema-1.0-SNAPSHOT-jar-with-dependencies.jar", 
 										"/home/etl_subsystem/apache-storm-1.0.2/lib/");
 			proc = builder.start();
 			waitime = proc.waitFor();

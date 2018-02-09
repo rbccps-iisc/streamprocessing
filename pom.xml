@@ -80,14 +80,14 @@
       	<scope>compile</scope>
     </dependency>
 	
-	<!-- <dependency>
+	<dependency>
     		<groupId>com.protoTest</groupId>
    	 	<artifactId>protoschema</artifactId>
     		<version>1.0-SNAPSHOT</version>
     		<scope>system</scope>
     		<systemPath>/Users/sahiltyagi/Documents/IISc/protoschema/target/protoschema-1.0-SNAPSHOT-jar-with-dependencies.jar</systemPath>
-    		<systemPath>/home/etl_subsystem/protoschema/target/protoschema-1.0-SNAPSHOT-jar-with-dependencies.jar</systemPath>
-    </dependency> -->
+    		<!-- <systemPath>/home/etl_subsystem/protoschema/target/protoschema-1.0-SNAPSHOT-jar-with-dependencies.jar</systemPath> -->
+    </dependency>
     
     <dependency>
     		<groupId>com.google.protobuf</groupId>

@@ -47,6 +47,7 @@ import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
+import robertbosch.schema.validation.JSONmessagespout;
 import robertbosch.schema.validation.NetworkserverSpout;
 
 public class RobertBoschUtils implements MqttCallback {
@@ -137,84 +138,39 @@ public class RobertBoschUtils implements MqttCallback {
 	
 	}
 	
-	public static void subscribeToSensorData() {
-//		try {
-//			ConnectionFactory factory = new ConnectionFactory();
-//			factory.setHost(props.getProperty("host"));
-//			factory.setPort(Integer.parseInt(props.getProperty("port")));
-//			factory.setUsername(props.getProperty("username"));
-//			factory.setPassword(props.getProperty("password"));
-//			factory.setVirtualHost(props.getProperty("virtualhost"));
-//
-//			Connection conn = factory.newConnection();
-//			Channel channel = conn.createChannel();
-//			channel.exchangeDeclare(props.getProperty("exchange"), "topic", true);
-//			
-//			System.out.println("going to subscribe...");
-//			Consumer consumer = new DefaultConsumer(channel) {
-//				public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-//					if(body != null) {
-//						//SchemaBrokerSpout.nbqueue.add(body);
-//						//String message = new String(body, "UTF-8");
-//						//System.out.println("message is:" + message);
-//						//list.add(message);
-//						//System.out.println(" [x] Received '" + message + "'");
-//						
-//					}
-//				}  
-//			};
-//			
-//			channel.queueDeclare(props.getProperty("queuename"), true, false, false, null);
-//			channel.queueBind(props.getProperty("queuename"), props.getProperty("exchange"), props.getProperty("bindingkey"));
-//			channel.basicConsume(props.getProperty("queuename"), true, consumer);
-//			
-//		} catch(IOException e) {
-//			e.printStackTrace();
-//		} catch(TimeoutException t) {
-//			t.printStackTrace();
-//		}
-		
-//		try {
-//			String deviceId=null;
-//			ConnectionFactory factory = new ConnectionFactory();
-//			factory.setHost(props.getProperty("host"));
-//			factory.setPort(Integer.parseInt(props.getProperty("port")));
-//			factory.setUsername(props.getProperty("username"));
-//			factory.setPassword(props.getProperty("password"));
-//			factory.setVirtualHost(props.getProperty("virtualhost"));
-//
-//			Connection conn = factory.newConnection();
-//			Channel channel = conn.createChannel();
-//			channel.exchangeDeclare(props.getProperty("exchange"), deviceId, true);
-//			
-//			System.out.println("going to subscribe for device: " + deviceId);
-//			Consumer consumer = new DefaultConsumer(channel) {
-//				public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-//					if(body != null) {
-//						
-//						ConcurrentLinkedQueue<byte[]> nonblockingqueue = new ConcurrentLinkedQueue<byte[]>();
-//						nonblockingqueue.add(deviceId.getBytes());
-//						nonblockingqueue.add(body);
-//						
-//						if(!nonblockingqueue.isEmpty()) {
-//							//NetworkserverSpout.brokerqueue.add(nonblockingqueue);
-//							nonblockingqueue.clear();
-//						}
-//						
-//					}
-//				}  
-//			};
-//			
-//			channel.queueDeclare(props.getProperty("queuename"), true, false, false, null);
-//			channel.queueBind(props.getProperty("queuename"), props.getProperty("exchange"), props.getProperty("bindingkey"));
-//			channel.basicConsume(props.getProperty("queuename"), true, consumer);
-//			
-//		} catch(IOException e) {
-//			e.printStackTrace();
-//		} catch(TimeoutException e) {
-//			e.printStackTrace();
-//		}
-		
+	public static void subscribeToBrokerData() {
+		try {
+			String deviceId=null;
+			ConnectionFactory factory = new ConnectionFactory();
+			factory.setHost(props.getProperty("host"));
+			factory.setPort(Integer.parseInt(props.getProperty("port")));
+			factory.setUsername(props.getProperty("username"));
+			factory.setPassword(props.getProperty("password"));
+			factory.setVirtualHost(props.getProperty("virtualhost"));
+
+			Connection conn = factory.newConnection();
+			Channel channel = conn.createChannel();
+			channel.exchangeDeclare(props.getProperty("exchange"), deviceId, true);
+			
+			System.out.println("going to subscribe for device: " + deviceId);
+			Consumer consumer = new DefaultConsumer(channel) {
+				public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+					if(body != null) {
+						
+						JSONmessagespout.jsonqueue.add(body);
+					}
+				}  
+			};
+			
+			channel.queueDeclare(props.getProperty("queuename"), true, false, false, null);
+			channel.queueBind(props.getProperty("queuename"), props.getProperty("exchange"), props.getProperty("bindingkey"));
+			channel.basicConsume(props.getProperty("queuename"), true, consumer);
+			
+		} catch(IOException e) {
+			e.printStackTrace();
+		} catch(TimeoutException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void subscribeToNetworkServer() {
@@ -354,7 +310,7 @@ public class RobertBoschUtils implements MqttCallback {
 	
 	private static void checkValidation() {
 		list = new ArrayList<String>();
-		subscribeToSensorData();
+		//subscribeToSensorData();
 		while(true) {
 			if(list.size() > 0) {
 				int index=0;

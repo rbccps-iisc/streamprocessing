@@ -12,6 +12,7 @@ import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
+import org.apache.storm.tuple.Values;
 
 import robertbosch.utils.ProtobufDeserializer;
 import robertbosch.utils.RobertBoschUtils;
@@ -42,21 +43,24 @@ public class ProtoConversionBolt extends BaseRichBolt {
 			
 			System.out.println("******************** link: " + NetworkserverSpout.deviceprotoschema.get(device).split("___")[0]);
 			System.out.println("~~~~~~~~~~~~~~~~~~~~ mainmessage: " + NetworkserverSpout.deviceprotoschema.get(device).split("___")[1]);
-			//deserialize(byte[] buffer, String message, String url)
-			//url__message
+			//deserialize method args:(byte[] buffer, String message, String url)
+			//url___message
 			jsondata = ProtobufDeserializer.deserialize(data, NetworkserverSpout.deviceprotoschema.get(device).split("___")[1], 
 												NetworkserverSpout.deviceprotoschema.get(device).split("___")[0]);
 			System.out.println("#################################$$$******************%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% data is: " + jsondata);
 			
+			Values values = new Values(jsondata);
+			outputCollector.emit(values);
+			values.clear();
+			
 //			try {
-//				
+//			
 //				RobertBoschUtils.publishchannel.queueDeclare(RobertBoschUtils.pubTopic, false, false, false, null);
 //				RobertBoschUtils.publishchannel.basicPublish("", RobertBoschUtils.pubTopic, null, jsondata.getBytes());
-//				
+//			
 //			} catch(IOException e) {
-//				e.printStackTrace();
+//			e.printStackTrace();
 //			}
-			
 		}
 		
 	}

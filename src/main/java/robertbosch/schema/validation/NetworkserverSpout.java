@@ -24,7 +24,6 @@ public class NetworkserverSpout extends BaseRichSpout {
 	private static final long serialVersionUID = 1L;
 	SpoutOutputCollector spoutcollector;
 	public static ConcurrentLinkedQueue<byte[]> loraserverqueue = new ConcurrentLinkedQueue<byte[]>();
-	//public static ConcurrentLinkedQueue<String> protoURLs = new ConcurrentLinkedQueue<String>();
 	public static ConcurrentHashMap<String, String> deviceprotoschema = new ConcurrentHashMap<String, String>();
 	Values values;
 	byte[] lorabinarydata, protobinary;
@@ -37,8 +36,7 @@ public class NetworkserverSpout extends BaseRichSpout {
 	public void nextTuple() {
 		// TODO Auto-generated method stub
 		try {
-			//if(loraserverqueue != null && loraserverqueue.size() >0) {
-			if(loraserverqueue.size() >0) {
+			if(loraserverqueue != null && loraserverqueue.size() >0) {
 				System.out.println("................................................................entered into the condition");
 				lorabinarydata = loraserverqueue.poll();
 				loradata = new String(lorabinarydata, StandardCharsets.UTF_8);
@@ -50,7 +48,7 @@ public class NetworkserverSpout extends BaseRichSpout {
 				protobinary = Base64.getDecoder().decode(protodata);
 				values = new Values(deviceid, protobinary);
 				spoutcollector.emit(values);
-				
+				values.clear();
 			}
 		} catch(ParseException p) {
 			p.printStackTrace();

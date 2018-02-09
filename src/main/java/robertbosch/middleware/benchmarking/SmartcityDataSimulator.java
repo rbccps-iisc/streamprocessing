@@ -19,7 +19,7 @@ import org.json.simple.JSONObject;
 
 import com.google.protobuf.util.JsonFormat;
 //import com.protoTest.smartcity.Pollut;
-//import com.protoTest.smartcity.Sensed;
+import com.protoTest.smartcity.Sensed;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -87,26 +87,26 @@ public class SmartcityDataSimulator implements MqttCallback {
 		int batterylevel = ThreadLocalRandom.current().nextInt(0, 5001);
 		int dataSamplingInstant = ThreadLocalRandom.current().nextInt(10000000, 99999999);
 		
-//		Sensed.sensor_values.Builder sensorval = Sensed.sensor_values.newBuilder();
-//		sensorval.setLuxOutput(luxOutput);
-//		sensorval.setPowerConsumption(powerconsumption);
-//		sensorval.setCaseTemperature(casetemperature);
-//		sensorval.setAmbientLux(ambientlux);
-//		sensorval.setSlaveAlive(slaveAlive);
-//		sensorval.setBatteryLevel(batterylevel);
-//		sensorval.setDataSamplingInstant(dataSamplingInstant);
+		Sensed.sensor_values.Builder sensorval = Sensed.sensor_values.newBuilder();
+		sensorval.setLuxOutput(luxOutput);
+		sensorval.setPowerConsumption(powerconsumption);
+		sensorval.setCaseTemperature(casetemperature);
+		sensorval.setAmbientLux(ambientlux);
+		sensorval.setSlaveAlive(slaveAlive);
+		sensorval.setBatteryLevel(batterylevel);
+		sensorval.setDataSamplingInstant(dataSamplingInstant);
 //		
-//		byte[] snsr = sensorval.build().toByteArray();
-//		JSONObject ob = new JSONObject();
-//		ob.put("devEUI", "70b3d58ff0031f00");
-//		ob.put("data", snsr);
+		byte[] snsr = sensorval.build().toByteArray();
+		JSONObject ob = new JSONObject();
+		ob.put("devEUI", "70b3d58ff0031f00");
+		ob.put("data", snsr);
 		
 //		System.out.println(ob.toJSONString());
 //		Object o = Sensed.sensor_values.parseFrom(snsr);
 //		String packet=JsonFormat.printer().print((Sensed.sensor_values)o);
 //		System.out.println("packet is:" + packet);
 		
-		//simulator.publishToNetworkServer(ob.toJSONString().getBytes());
+		simulator.publishToNetworkServer(ob.toJSONString().getBytes());
 		
 	}
 	
@@ -233,7 +233,7 @@ public class SmartcityDataSimulator implements MqttCallback {
 //		String publishfile = "/Users/sahiltyagi/Desktop/publish.txt";
 //		publish = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(publishfile)));
 		
-		int iterations =1;
+		int iterations =10000;
 		int index=0;
 		while(index<iterations) {
 			//obj.jsonstreetLight();
@@ -242,7 +242,7 @@ public class SmartcityDataSimulator implements MqttCallback {
 			index++;
 		}
 		
-		publish.close();
+		//publish.close();
 		System.out.println("complete.");
 	}
 
