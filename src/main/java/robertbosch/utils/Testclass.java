@@ -28,7 +28,7 @@ public class Testclass {
 		
 	}
 	
-	private static void subscriberabbitMQ(int datapoint) {
+	private static void subscriberabbitMQ(final int datapoint) {
 		//String subscribefile = "/Users/sahiltyagi/Desktop/subscribe.txt";
 		String subscribefile = "/home/etl_subsystem/subscribe.txt";
 		RobertBoschUtils rb = new RobertBoschUtils();
