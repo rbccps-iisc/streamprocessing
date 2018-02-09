@@ -31,7 +31,6 @@ public class Testclass {
 	private static void subscriberabbitMQ(int datapoint) {
 		//String subscribefile = "/Users/sahiltyagi/Desktop/subscribe.txt";
 		String subscribefile = "/home/etl_subsystem/subscribe.txt";
-		JSONParser parser = new JSONParser();
 		RobertBoschUtils rb = new RobertBoschUtils();
 		try {
 			final BufferedWriter subscriber = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(subscribefile)));
@@ -53,6 +52,7 @@ public class Testclass {
 					//RabbitMQSpout.nbqueue.add(body);
 					String message = new String(body, "UTF-8");
 				    System.out.println(" [x] Received '" + message + "'");
+				    JSONParser parser = new JSONParser();
 				  
 					try {
 						Object ob = parser.parse(message);
