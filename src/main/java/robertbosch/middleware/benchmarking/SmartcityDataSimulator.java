@@ -65,9 +65,8 @@ public class SmartcityDataSimulator implements MqttCallback {
 		//System.out.println(packet);
 		
 		try {
-			String device = "sahil";
-			channel.queueDeclare("simulator", false, false, false, null);
-			channel.basicPublish("", device, null, packet.getBytes());
+			String topic = "sahil";
+			channel.basicPublish("", topic, null, packet.getBytes());
 			publish.write(System.currentTimeMillis() + "," + deviceId + "\n");
 			
 		} catch(IOException e) {
@@ -228,7 +227,7 @@ public class SmartcityDataSimulator implements MqttCallback {
 	public static void main(String[] args) throws Exception {
 		//RobertBoschUtils.getPublishChannel();
 		SmartcityDataSimulator obj = new SmartcityDataSimulator();
-		//channel = obj.createbrokerChannel("sahil");
+		channel = obj.createbrokerChannel("sahil");
 		
 		//String publishfile = "/Users/sahiltyagi/Desktop/publish.txt";
 		String publishfile = "/home/etl_subsystem/publish.txt";

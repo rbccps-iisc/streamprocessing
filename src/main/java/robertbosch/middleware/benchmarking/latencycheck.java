@@ -10,11 +10,19 @@ import java.io.OutputStreamWriter;
 
 public class latencycheck {
 	public static void main(String[] args) throws IOException {
-		BufferedReader subrdr = new BufferedReader(new InputStreamReader(new FileInputStream("/Users/sahiltyagi/Desktop/subscribe.txt")));
-		BufferedWriter output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("/Users/sahiltyagi/Desktop/latency_out.txt")));
+//		String sub = "/Users/sahiltyagi/Desktop/subscribe.txt";
+//		String lat = "/Users/sahiltyagi/Desktop/latency_out.txt";
+//		String pub = "/Users/sahiltyagi/Desktop/publish.txt";
+		
+		String sub = "/home/etl_subsystem/subscribe.txt";
+		String lat = "/home/etl_subsystem/latency_out.txt";
+		String pub = "/home/etl_subsystem/publish.txt";
+		
+		BufferedReader subrdr = new BufferedReader(new InputStreamReader(new FileInputStream(sub)));
+		BufferedWriter output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(lat)));
 		String rec;
 		while((rec=subrdr.readLine()) != null) {
-			BufferedReader pubrdr = new BufferedReader(new InputStreamReader(new FileInputStream("/Users/sahiltyagi/Desktop/publish.txt")));
+			BufferedReader pubrdr = new BufferedReader(new InputStreamReader(new FileInputStream(pub)));
 			String line;
 			while((line=pubrdr.readLine()) !=null) {
 				if(rec.split(",")[1].equalsIgnoreCase(line.split(",")[1])) {
