@@ -246,9 +246,9 @@ public class SmartcityDataSimulator implements MqttCallback {
 		int iterations=1;
 		int index=0;
 		while(index<iterations) {
-			//obj.jsonstreetLight();
+			obj.jsonstreetLight();
 			//obj.protostreetlight();
-			obj.protopollution();
+			//obj.protopollution();
 			//obj.jsonenergyMeter();
 			index++;
 		}
