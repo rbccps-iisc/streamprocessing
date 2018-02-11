@@ -50,7 +50,5 @@ public class latencycheck {
 		output.close();
 		
 		System.out.println("total latency incurred:" + Double.parseDouble(String.valueOf(sumlatency/ctr)));
-		subrdr.close();
-		output.close();
 	}
 }

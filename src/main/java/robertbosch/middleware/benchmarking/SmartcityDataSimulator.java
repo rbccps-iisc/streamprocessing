@@ -238,8 +238,8 @@ public class SmartcityDataSimulator implements MqttCallback {
 		SmartcityDataSimulator obj = new SmartcityDataSimulator();
 		channel = obj.createbrokerChannel("sahil");
 		
-		String publishfile = "/Users/sahiltyagi/Desktop/publish.txt";
-		//String publishfile = "/home/etl_subsystem/publish.txt";
+		//String publishfile = "/Users/sahiltyagi/Desktop/publish.txt";
+		String publishfile = "/home/etl_subsystem/publish.txt";
 		publish = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(publishfile)));
 		
 		//int iterations =Integer.parseInt(args[0]);
