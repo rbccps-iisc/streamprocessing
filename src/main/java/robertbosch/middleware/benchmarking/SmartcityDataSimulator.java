@@ -18,6 +18,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.simple.JSONObject;
 
 import com.google.protobuf.util.JsonFormat;
+import com.protoTest.smartcity.Pollut;
 //import com.protoTest.smartcity.Pollut;
 import com.protoTest.smartcity.Sensed;
 import com.rabbitmq.client.Channel;
@@ -63,15 +64,16 @@ public class SmartcityDataSimulator implements MqttCallback {
 		//String packet = "{\"devEUI\": \"" + deviceId + "\",\"data\": \"" + data.toJSONString() + "\"}";
 		String packet = finalobj.toJSONString();
 		//System.out.println(packet);
+		System.out.println("size of packets: " + packet.getBytes().length);
 		
-		try {
-			String topic = "sahil";
-			channel.basicPublish("", topic, null, packet.getBytes());
-			publish.write(System.currentTimeMillis() + "," + deviceId + "\n");
-			
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			String topic = "sahil";
+//			channel.basicPublish("", topic, null, packet.getBytes());
+//			publish.write(System.currentTimeMillis() + "," + deviceId + "\n");
+//			
+//		} catch(IOException e) {
+//			e.printStackTrace();
+//		}
 	}
 	
 	private void protostreetlight() throws Exception {
@@ -105,7 +107,9 @@ public class SmartcityDataSimulator implements MqttCallback {
 //		String packet=JsonFormat.printer().print((Sensed.sensor_values)o);
 //		System.out.println("packet is:" + packet);
 		
-		simulator.publishToNetworkServer(ob.toJSONString().getBytes());
+		
+		System.out.println("protostreet light size:" + ob.toJSONString().getBytes().length);
+		//simulator.publishToNetworkServer(ob.toJSONString().getBytes());
 		
 	}
 	
@@ -116,11 +120,17 @@ public class SmartcityDataSimulator implements MqttCallback {
 		int co2 = ThreadLocalRandom.current().nextInt(10, 50);
 		float noiselevel = ThreadLocalRandom.current().nextInt(0, 100);
 		
-//		Pollut.pollution.Builder pollutiondata = Pollut.pollution.newBuilder();
-//		pollutiondata.setPM25(pm25);
-//		pollutiondata.setPM10(pm10);
-//		pollutiondata.setCO2(co2);
-//		pollutiondata.setNOISELEVEL(noiselevel);
+		Pollut.pollution.Builder pollutiondata = Pollut.pollution.newBuilder();
+		pollutiondata.setPM25(pm25);
+		pollutiondata.setPM10(pm10);
+		pollutiondata.setCO2(co2);
+		pollutiondata.setNOISELEVEL(noiselevel);
+		
+		byte[] snsr = pollutiondata.build().toByteArray();
+		JSONObject ob = new JSONObject();
+		ob.put("devEUI", "70b3d58ff0031f00");
+		ob.put("data", snsr);
+		System.out.println("pollution sensor size: " + ob.toJSONString().getBytes().length);
 		
 	}
 	
@@ -175,7 +185,7 @@ public class SmartcityDataSimulator implements MqttCallback {
 		
 		//String packet = "[\"key\": \"energymeter_id\"," + data.toJSONString() + "]";
 		String packet = "[\"key\": \"" + deviceId + "\"," + data.toJSONString() + "]";
-		System.out.println(packet);
+		System.out.println("energy meter size: " + packet.getBytes().length);
 	}
 	
 	private Channel createbrokerChannel(String deviceId) {
@@ -229,15 +239,17 @@ public class SmartcityDataSimulator implements MqttCallback {
 		SmartcityDataSimulator obj = new SmartcityDataSimulator();
 		channel = obj.createbrokerChannel("sahil");
 		
-		//String publishfile = "/Users/sahiltyagi/Desktop/publish.txt";
-		String publishfile = "/home/etl_subsystem/publish.txt";
+		String publishfile = "/Users/sahiltyagi/Desktop/publish.txt";
+		//String publishfile = "/home/etl_subsystem/publish.txt";
 		publish = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(publishfile)));
 		
-		int iterations =Integer.parseInt(args[0]);
+		//int iterations =Integer.parseInt(args[0]);
+		int iterations=1;
 		int index=0;
 		while(index<iterations) {
-			obj.jsonstreetLight();
+			//obj.jsonstreetLight();
 			//obj.protostreetlight();
+			obj.protopollution();
 			//obj.jsonenergyMeter();
 			index++;
 		}
