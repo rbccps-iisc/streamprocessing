@@ -41,7 +41,7 @@ public class latencycheck {
 		
 		for(Map.Entry<String, Long> set : pubmap.entrySet()) {
 			long val = submap.get(set.getKey()) - set.getValue();
-			output.write(String.valueOf(val));
+			output.write(String.valueOf(val) + "\n");
 			if(val>0) {
 				sumlatency +=val;
 				ctr++;
