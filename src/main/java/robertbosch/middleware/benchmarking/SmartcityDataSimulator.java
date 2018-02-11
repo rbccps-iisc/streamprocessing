@@ -242,8 +242,8 @@ public class SmartcityDataSimulator implements MqttCallback {
 		String publishfile = "/home/etl_subsystem/publish.txt";
 		publish = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(publishfile)));
 		
-		//int iterations =Integer.parseInt(args[0]);
-		int iterations=1;
+		int iterations =Integer.parseInt(args[0]);
+		//int iterations=1;
 		int index=0;
 		while(index<iterations) {
 			obj.jsonstreetLight();
