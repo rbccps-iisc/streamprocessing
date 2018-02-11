@@ -65,14 +65,14 @@ public class SmartcityDataSimulator implements MqttCallback {
 		//System.out.println(packet);
 		System.out.println("size of packets: " + packet.getBytes().length);
 		
-//		try {
-//			String topic = "sahil";
-//			channel.basicPublish("", topic, null, packet.getBytes());
-//			publish.write(System.currentTimeMillis() + "," + deviceId + "\n");
-//			
-//		} catch(IOException e) {
-//			e.printStackTrace();
-//		}
+		try {
+			String topic = "sahil";
+			channel.basicPublish("", topic, null, packet.getBytes());
+			publish.write(System.currentTimeMillis() + "," + deviceId + "\n");
+			
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void protostreetlight() throws Exception {
