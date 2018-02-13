@@ -19,7 +19,7 @@ import org.json.simple.JSONObject;
 
 import com.google.protobuf.util.JsonFormat;
 //import com.protoTest.smartcity.Pollut;
-//import com.protoTest.smartcity.Sensed;
+import com.protoTest.smartcity.Sensed;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
