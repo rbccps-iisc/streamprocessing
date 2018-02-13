@@ -51,13 +51,13 @@ public class Testclass {
 				    
 					//RabbitMQSpout.nbqueue.add(body);
 					String message = new String(body, "UTF-8");
-				    System.out.println(" [x] Received '" + message + "'");
+				    //System.out.println(" [x] Received '" + message + "'");
 				    JSONParser parser = new JSONParser();
 				  
 					try {
 						Object ob = parser.parse(message);
 						JSONObject jsonob = (JSONObject)ob;
-						System.out.println(jsonob.get("devEUI"));
+						//System.out.println(jsonob.get("devEUI"));
 						subscriber.write(System.currentTimeMillis() + "," + jsonob.get("devEUI") + "\n");
 						ctr++;
 						if(ctr == datapoint) {
