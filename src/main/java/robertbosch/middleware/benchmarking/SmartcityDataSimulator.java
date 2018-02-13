@@ -87,19 +87,21 @@ public class SmartcityDataSimulator implements MqttCallback {
 		int batterylevel = ThreadLocalRandom.current().nextInt(0, 5001);
 		int dataSamplingInstant = ThreadLocalRandom.current().nextInt(10000000, 99999999);
 		
-//		Sensed.sensor_values.Builder sensorval = Sensed.sensor_values.newBuilder();
-//		sensorval.setLuxOutput(luxOutput);
-//		sensorval.setPowerConsumption(powerconsumption);
-//		sensorval.setCaseTemperature(casetemperature);
-//		sensorval.setAmbientLux(ambientlux);
-//		sensorval.setSlaveAlive(slaveAlive);
-//		sensorval.setBatteryLevel(batterylevel);
-//		sensorval.setDataSamplingInstant(dataSamplingInstant);
-////		
-//		byte[] snsr = sensorval.build().toByteArray();
-//		JSONObject ob = new JSONObject();
-//		ob.put("devEUI", "70b3d58ff0031f00");
-//		ob.put("data", snsr);
+		Sensed.sensor_values.Builder sensorval = Sensed.sensor_values.newBuilder();
+		sensorval.setLuxOutput(luxOutput);
+		sensorval.setPowerConsumption(powerconsumption);
+		sensorval.setCaseTemperature(casetemperature);
+		sensorval.setAmbientLux(ambientlux);
+		sensorval.setSlaveAlive(slaveAlive);
+		sensorval.setBatteryLevel(batterylevel);
+		sensorval.setDataSamplingInstant(dataSamplingInstant);
+		
+		byte[] snsr = sensorval.build().toByteArray();
+		JSONObject ob = new JSONObject();
+		String deviceId = UUID.randomUUID().toString();
+		ob.put("devEUI", deviceId);
+		ob.put("data", snsr);
+		String packet = ob.toJSONString();
 		
 //		System.out.println(ob.toJSONString());
 //		Object o = Sensed.sensor_values.parseFrom(snsr);
@@ -108,8 +110,16 @@ public class SmartcityDataSimulator implements MqttCallback {
 		
 		
 //		System.out.println("protostreet light size:" + ob.toJSONString().getBytes().length);
-		//simulator.publishToNetworkServer(ob.toJSONString().getBytes());
+//		simulator.publishToNetworkServer(ob.toJSONString().getBytes());
 		
+		try {
+			String topic = "sahil";
+			channel.basicPublish("", topic, null, packet.getBytes());
+			publish.write(System.currentTimeMillis() + "," + deviceId + "\n");
+			
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void protopollution() {
@@ -259,9 +269,9 @@ public class SmartcityDataSimulator implements MqttCallback {
 		int index=0;
 		while(index<iterations) {
 			//obj.jsonstreetLight();
-			//obj.protostreetlight();
+			obj.protostreetlight();
 			//obj.protopollution();
-			obj.jsonenergyMeter();
+			//obj.jsonenergyMeter();
 			index++;
 		}
 		
