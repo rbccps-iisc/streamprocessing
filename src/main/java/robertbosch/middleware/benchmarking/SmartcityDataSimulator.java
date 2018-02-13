@@ -182,9 +182,21 @@ public class SmartcityDataSimulator implements MqttCallback {
 		
 		String deviceId = "energy-" + UUID.randomUUID().toString();
 		
-		//String packet = "[\"key\": \"energymeter_id\"," + data.toJSONString() + "]";
-		String packet = "[\"key\": \"" + deviceId + "\"," + data.toJSONString() + "]";
-		System.out.println("energy meter size: " + packet.getBytes().length);
+//		String packet = "[\"key\": \"" + deviceId + "\"," + data.toJSONString() + "]";
+//		System.out.println("energy meter size: " + packet.getBytes().length);
+		
+		JSONObject finalobj = new JSONObject();
+		finalobj.put("devEUI", deviceId);
+		finalobj.put("data", data);
+		String packet = finalobj.toJSONString();
+		try {
+			String topic = "sahil";
+			channel.basicPublish("", topic, null, packet.getBytes());
+			publish.write(System.currentTimeMillis() + "," + deviceId + "\n");
+			
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private Channel createbrokerChannel(String deviceId) {
@@ -246,10 +258,10 @@ public class SmartcityDataSimulator implements MqttCallback {
 		//int iterations=1;
 		int index=0;
 		while(index<iterations) {
-			obj.jsonstreetLight();
+			//obj.jsonstreetLight();
 			//obj.protostreetlight();
 			//obj.protopollution();
-			//obj.jsonenergyMeter();
+			obj.jsonenergyMeter();
 			index++;
 		}
 		
