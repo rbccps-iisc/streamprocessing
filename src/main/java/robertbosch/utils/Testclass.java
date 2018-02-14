@@ -58,7 +58,7 @@ public class Testclass {
 						Object ob = parser.parse(message);
 						JSONObject jsonob = (JSONObject)ob;
 						//System.out.println(jsonob.get("devEUI"));
-						subscriber.write(System.currentTimeMillis() + "," + jsonob.get("devEUI") + "\n");
+						subscriber.write(System.currentTimeMillis() + "," + jsonob.get("msgid") + "\n");
 						ctr++;
 						if(ctr == datapoint) {
 							subscriber.close();

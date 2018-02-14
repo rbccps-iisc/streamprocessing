@@ -53,22 +53,19 @@ public class SmartcityDataSimulator implements MqttCallback {
 		data.put("batteryLevel", batterylevel);
 		data.put("dataSamplingInstant", dataSamplingInstant);
 		
-		String deviceId = "streetlight-" + UUID.randomUUID().toString();
+		String msgId = "streetlight-" + UUID.randomUUID().toString();
 		
 		JSONObject finalobj = new JSONObject();
-		finalobj.put("devEUI", deviceId);
+		finalobj.put("msgid", msgId);
 		finalobj.put("data", data);
 		
-		//String packet = "[\"key\": \"" + deviceId + "\"," + data.toJSONString() + "]";
-		//String packet = "{\"devEUI\": \"" + deviceId + "\",\"data\": \"" + data.toJSONString() + "\"}";
 		String packet = finalobj.toJSONString();
-		//System.out.println(packet);
 		System.out.println("size of packets: " + packet.getBytes().length);
 		
 		try {
 			String topic = "sahil";
 			channel.basicPublish("", topic, null, packet.getBytes());
-			publish.write(System.currentTimeMillis() + "," + deviceId + "\n");
+			publish.write(System.currentTimeMillis() + "," + msgId + "\n");
 			
 		} catch(IOException e) {
 			e.printStackTrace();
@@ -256,27 +253,25 @@ public class SmartcityDataSimulator implements MqttCallback {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		//RobertBoschUtils.getPublishChannel();
+		
+		//simulator emitting a single device
 		SmartcityDataSimulator obj = new SmartcityDataSimulator();
 		channel = obj.createbrokerChannel("sahil");
-		
-		//String publishfile = "/Users/sahiltyagi/Desktop/publish.txt";
 		String publishfile = "/home/etl_subsystem/publish.txt";
 		publish = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(publishfile)));
 		
 		int iterations =Integer.parseInt(args[0]);
-		//int iterations=1;
+		long sleeptime =Long.parseLong(args[1]);
 		int index=0;
 		while(index<iterations) {
-			//obj.jsonstreetLight();
-			obj.protostreetlight();
-			//obj.protopollution();
-			//obj.jsonenergyMeter();
+			obj.jsonstreetLight();
 			index++;
+			Thread.sleep(sleeptime);
 		}
 		
 		publish.close();
 		System.out.println("complete.");
+		
 	}
 
 	@Override
