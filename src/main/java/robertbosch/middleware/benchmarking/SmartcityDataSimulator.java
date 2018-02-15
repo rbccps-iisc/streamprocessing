@@ -64,8 +64,8 @@ public class SmartcityDataSimulator implements MqttCallback {
 		
 		try {
 			String topic = "sahil";
-			channel.basicPublish("", topic, null, packet.getBytes());
 			publish.write(System.currentTimeMillis() + "," + msgId + "\n");
+			channel.basicPublish("", topic, null, packet.getBytes());
 			
 		} catch(IOException e) {
 			e.printStackTrace();
@@ -209,10 +209,10 @@ public class SmartcityDataSimulator implements MqttCallback {
 	private Channel createbrokerChannel(String deviceId) {
 		
 		ConnectionFactory connfac = new ConnectionFactory();
-		connfac.setHost("10.156.14.9");
+		connfac.setHost("10.156.14.6");
 		connfac.setPort(5672);
-		connfac.setUsername("sahil");
-		connfac.setPassword("sahil0407");
+		connfac.setUsername("rbccps");
+		connfac.setPassword("rbccps@123");
 		Channel channel = null;
 		
 		try {
@@ -262,14 +262,24 @@ public class SmartcityDataSimulator implements MqttCallback {
 		
 		int iterations =Integer.parseInt(args[0]);
 		long sleeptime =Long.parseLong(args[1]);
+		String param = args[2];
 		int index=0;
-		while(index<iterations) {
-			obj.jsonstreetLight();
+		while(true) {
+			if(param.equals("light")) {
+				obj.jsonstreetLight();
+				
+			} else if(param.equals("energy")) {
+				obj.jsonenergyMeter();
+			}
+			
 			index++;
 			Thread.sleep(sleeptime);
+			if(iterations == index+1) {
+				publish.close();
+				break;
+			}
 		}
 		
-		publish.close();
 		System.out.println("complete.");
 		
 	}

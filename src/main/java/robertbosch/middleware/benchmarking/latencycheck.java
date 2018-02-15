@@ -12,13 +12,13 @@ import java.util.Map;
 
 public class latencycheck {
 	public static void main(String[] args) throws IOException {
-//		String sub = "/Users/sahiltyagi/Desktop/subscribe.txt";
-//		String lat = "/Users/sahiltyagi/Desktop/latency_out.txt";
-//		String pub = "/Users/sahiltyagi/Desktop/publish.txt";
+		String sub = "/Users/sahiltyagi/Desktop/subscribe.txt";
+		String lat = "/Users/sahiltyagi/Desktop/latency_out.txt";
+		String pub = "/Users/sahiltyagi/Desktop/publish.txt";
 		
-		String sub = "/home/etl_subsystem/subscribe.txt";
-		String lat = "/home/etl_subsystem/latency_out.txt";
-		String pub = "/home/etl_subsystem/publish.txt";
+//		String sub = "/home/etl_subsystem/subscribe.txt";
+//		String lat = "/home/etl_subsystem/latency_out.txt";
+//		String pub = "/home/etl_subsystem/publish.txt";
 		int ctr=0;
 		long sumlatency=0L;
 		
@@ -40,8 +40,12 @@ public class latencycheck {
 		pubrdr.close();
 		
 		for(Map.Entry<String, Long> set : pubmap.entrySet()) {
-			long val = submap.get(set.getKey()) - set.getValue();
+			String k = set.getKey();
+			long val = submap.get(k) - set.getValue();
 			output.write(String.valueOf(val) + "\n");
+			if(val <0) {
+				System.out.println(k);
+			}
 			if(val>0) {
 				sumlatency +=val;
 				ctr++;
