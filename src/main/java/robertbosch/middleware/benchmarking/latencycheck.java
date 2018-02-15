@@ -30,28 +30,29 @@ public class latencycheck {
 		Map<String, Long> pubmap = new HashMap<String, Long>();
 		
 		while((rec=subrdr.readLine()) != null) {
-			submap.put(rec.split(",")[1], Long.parseLong(rec.split(",")[0]));
+			submap.put(rec.split(",")[1].trim(), Long.parseLong(rec.split(",")[0]));
 		}
 		subrdr.close();
 		
 		while((rec=pubrdr.readLine()) != null) {
-			pubmap.put(rec.split(",")[1], Long.parseLong(rec.split(",")[0]));
+			pubmap.put(rec.split(",")[1].trim(), Long.parseLong(rec.split(",")[0]));
 		}
 		pubrdr.close();
+		System.out.println("pubmap size: " + pubmap.size());
+		System.out.println("submap size: " + submap.size());
 		
 		for(Map.Entry<String, Long> set : pubmap.entrySet()) {
 			String k = set.getKey();
-			long val = submap.get(k) - set.getValue();
-			output.write(String.valueOf(val) + "\n");
-			if(val <0) {
-				System.out.println(k);
-			}
-			if(val>0) {
+			System.out.println(k);
+			if(submap.containsKey(k)) {
+				long val = submap.get(k) - set.getValue();
+				output.write(String.valueOf(val) + "\n");
 				sumlatency +=val;
 				ctr++;
 			}
 		}
 		output.close();
+		System.out.println("counter is: " + ctr);
 		
 		System.out.println("total latency incurred:" + Double.parseDouble(String.valueOf(sumlatency/ctr)));
 	}

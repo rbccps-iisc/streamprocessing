@@ -111,8 +111,8 @@ public class SmartcityDataSimulator implements MqttCallback {
 		
 		try {
 			String topic = "sahil";
-			channel.basicPublish("", topic, null, packet.getBytes());
 			publish.write(System.currentTimeMillis() + "," + deviceId + "\n");
+			channel.basicPublish("", topic, null, packet.getBytes());
 			
 		} catch(IOException e) {
 			e.printStackTrace();
@@ -187,19 +187,16 @@ public class SmartcityDataSimulator implements MqttCallback {
 		data.put("dataSamplingInstant", dataSamplingInstant);
 		data.put("EnergyActive", EnergyActive);
 		
-		String deviceId = "energy-" + UUID.randomUUID().toString();
-		
-//		String packet = "[\"key\": \"" + deviceId + "\"," + data.toJSONString() + "]";
-//		System.out.println("energy meter size: " + packet.getBytes().length);
+		String msgid = "energy-" + UUID.randomUUID().toString();
 		
 		JSONObject finalobj = new JSONObject();
-		finalobj.put("devEUI", deviceId);
+		finalobj.put("msgid", msgid);
 		finalobj.put("data", data);
 		String packet = finalobj.toJSONString();
 		try {
 			String topic = "sahil";
+			publish.write(System.currentTimeMillis() + "," + msgid + "\n");
 			channel.basicPublish("", topic, null, packet.getBytes());
-			publish.write(System.currentTimeMillis() + "," + deviceId + "\n");
 			
 		} catch(IOException e) {
 			e.printStackTrace();
