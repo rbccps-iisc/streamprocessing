@@ -209,10 +209,10 @@ public class SmartcityDataSimulator implements MqttCallback {
 	private Channel createbrokerChannel(String deviceId) {
 		
 		ConnectionFactory connfac = new ConnectionFactory();
-		connfac.setHost("10.156.14.6");
+		connfac.setHost("10.156.14.9");
 		connfac.setPort(5672);
-		connfac.setUsername("rbccps");
-		connfac.setPassword("rbccps@123");
+		connfac.setUsername("sahil");
+		connfac.setPassword("sahil0407");
 		Channel channel = null;
 		
 		try {

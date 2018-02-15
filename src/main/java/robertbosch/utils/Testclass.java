@@ -51,7 +51,7 @@ public class Testclass {
 				    
 					//RabbitMQSpout.nbqueue.add(body);
 					String message = new String(body, "UTF-8");
-				    System.out.println(" [x] Received '" + message + "'");
+				    //System.out.println(" [x] Received '" + message + "'");
 				    JSONParser parser = new JSONParser();
 				  
 					try {
