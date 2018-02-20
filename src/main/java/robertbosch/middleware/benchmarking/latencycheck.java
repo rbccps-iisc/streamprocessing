@@ -12,10 +12,17 @@ import java.util.Map;
 
 public class latencycheck {
 	public static void main(String[] args) throws IOException {
-		String sub = "/Users/sahiltyagi/Desktop/subscribe.txt";
-		String lat = "/Users/sahiltyagi/Desktop/latency_out.txt";
-		String pub = "/Users/sahiltyagi/Desktop/publish.txt";
+		//local system settings
+//		String sub = "/Users/sahiltyagi/Desktop/subscribe.txt";
+//		String lat = "/Users/sahiltyagi/Desktop/latency_out.txt";
+//		String pub = "/Users/sahiltyagi/Desktop/publish.txt";
 		
+		//ec2 instance settings
+		String sub = "/home/ubuntu/subscribe.txt";
+		String lat = "/home/ubuntu/latency_out.txt";
+		String pub = "/home/ubuntu/publish.txt";
+		
+		//rb vm settings
 //		String sub = "/home/etl_subsystem/subscribe.txt";
 //		String lat = "/home/etl_subsystem/latency_out.txt";
 //		String pub = "/home/etl_subsystem/publish.txt";

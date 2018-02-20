@@ -99,6 +99,7 @@ public class SmartcityDataSimulator implements MqttCallback {
 		ob.put("devEUI", deviceId);
 		ob.put("data", snsr);
 		String packet = ob.toJSONString();
+		System.out.println("size of packets: " + packet.getBytes().length);
 		
 //		System.out.println(ob.toJSONString());
 //		Object o = Sensed.sensor_values.parseFrom(snsr);
@@ -254,7 +255,8 @@ public class SmartcityDataSimulator implements MqttCallback {
 		//simulator emitting a single device
 		SmartcityDataSimulator obj = new SmartcityDataSimulator();
 		channel = obj.createbrokerChannel("sahil");
-		String publishfile = "/home/etl_subsystem/publish.txt";
+//		String publishfile = "/home/etl_subsystem/publish.txt";
+		String publishfile = "/home/ubuntu/publish.txt";
 		publish = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(publishfile)));
 		
 		int iterations =Integer.parseInt(args[0]);
