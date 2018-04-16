@@ -11,23 +11,26 @@ import org.apache.storm.topology.TopologyBuilder;
 public class ValidationTopology {
 	public static void main(String[] args) {
 		TopologyBuilder builder = new TopologyBuilder();
-		builder.setSpout("subscribe_spout", new NetworkserverSpout());
-		builder.setBolt("validation_bolt", new ProtoConversionBolt()).shuffleGrouping("subscribe_spout");
+		builder.setSpout("json_spout", new JSONmessagespout());
+		builder.setSpout("proto_spout", new NetworkserverSpout());
+		builder.setBolt("proto_to_json_bolt", new ProtoConversionBolt()).shuffleGrouping("proto_spout");
+		builder.setBolt("validator_bolt", new SchemaValidatorBolt()).shuffleGrouping("proto_to_json_bolt").shuffleGrouping("json_spout");
 		
 		Config config = new Config();
-		LocalCluster cluster = new LocalCluster();
 		
-		cluster.submitTopology("Validation Server", config, builder.createTopology());
+		//running in local mode
+		LocalCluster cluster = new LocalCluster();
+		cluster.submitTopology("validation topology", config, builder.createTopology());
 		try {
 			Thread.sleep(1000000000);
 		} catch(InterruptedException e) {
 			e.printStackTrace();
 		}
-		
 		cluster.shutdown();
 		
+		//running in remote mode
 //		try {
-//			StormSubmitter.submitTopology("Validation Server", config, builder.createTopology());
+//			StormSubmitter.submitTopology("Validation topology", config, builder.createTopology());
 //		} catch(InvalidTopologyException invalid) {
 //			invalid.printStackTrace();
 //		} catch(AlreadyAliveException alive) {

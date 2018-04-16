@@ -10,6 +10,9 @@ import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.base.BaseRichSpout;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Values;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import robertbosch.utils.RobertBoschUtils;
 
@@ -18,21 +21,28 @@ public class JSONmessagespout extends BaseRichSpout {
 	private static final long serialVersionUID = 1L;
 	SpoutOutputCollector spoutcollector;
 	public static ConcurrentLinkedQueue<byte[]> jsonqueue;
+	String deviceid, data;
+	JSONParser parser = new 	JSONParser();
+	JSONObject jsonob;
+	Object obj;
 
 	@Override
 	public void nextTuple() {
 		// TODO Auto-generated method stub
 		if(jsonqueue !=null && !jsonqueue.isEmpty()) {
-			
 			byte[] buffer = jsonqueue.poll();
 			try {
-				
 				String data = new String(buffer, "UTF-8");
-				Values vals = new Values("json", "*DEVICE ID*", data);
+				obj = parser.parse(data);
+				jsonob = (JSONObject)obj;
+				
+				Values vals = new Values(jsonob.get("key"), jsonob.get("data"));
 				spoutcollector.emit(vals);
 				vals.clear();
 			} catch(UnsupportedEncodingException e) {
 				e.printStackTrace();
+			} catch(ParseException p) {
+				p.printStackTrace();
 			}
 		}
 	}
@@ -49,7 +59,7 @@ public class JSONmessagespout extends BaseRichSpout {
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer arg0) {
 		// TODO Auto-generated method stub
-		arg0.declare(new Fields("type", "devEUI", "data"));
+		arg0.declare(new Fields("deviceid", "jsondata"));
 	}
 
 }

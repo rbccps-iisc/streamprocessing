@@ -23,42 +23,44 @@ public class Testclass {
 	
 	public static void main(String[] args) {
 		System.out.println("test rabbitmq subscriber...");
-		subscriberabbitMQ(Integer.parseInt(args[0]));
-		System.out.println("done with test proto code...");
+		subscriberabbitMQ(1);
+		System.out.println("done subscribing...");
 		
 	}
 	
 	private static void subscriberabbitMQ(final int datapoint) {
-		//String subscribefile = "/Users/sahiltyagi/Desktop/subscribe.txt";
+		String subscribefile = "/Users/sahiltyagi/Desktop/subscribe.txt";
 //		String subscribefile = "/home/etl_subsystem/subscribe.txt";
-		String subscribefile = "/home/ubuntu/subscribe.txt";
+//		String subscribefile = "/home/ubuntu/subscribe.txt";
 		RobertBoschUtils rb = new RobertBoschUtils();
 		try {
 			final BufferedWriter subscriber = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(subscribefile)));
 			
 			ConnectionFactory factory = new ConnectionFactory();
-			factory.setHost(RobertBoschUtils.props.getProperty("host"));
-			factory.setPort(Integer.parseInt(RobertBoschUtils.props.getProperty("port")));
-			factory.setUsername(RobertBoschUtils.props.getProperty("username"));
-			factory.setPassword(RobertBoschUtils.props.getProperty("password"));
-			factory.setVirtualHost(RobertBoschUtils.props.getProperty("virtualhost"));
+			factory.setHost("13.59.139.227");
+			factory.setPort(12082);
+			factory.setUsername("rbccps");
+			factory.setPassword("rbccps@123");
+			factory.setVirtualHost("/");
 			
 			Connection conn = factory.newConnection();
 			Channel channel = conn.createChannel();
-			channel.queueDeclare("sahil", false, false, false, null);
+			//channel.queueDeclare("streetlight", false, false, false, null);
+			channel.queueDeclare("streetlight", true, false, false, null);
 			
 			Consumer consumer = new DefaultConsumer(channel) {
 				public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
 				    
 					//RabbitMQSpout.nbqueue.add(body);
 					String message = new String(body, "UTF-8");
-				    //System.out.println(" [x] Received '" + message + "'");
+				    System.out.println(" [x] Received '" + message + "'");
 				    JSONParser parser = new JSONParser();
 				  
 					try {
 						Object ob = parser.parse(message);
 						JSONObject jsonob = (JSONObject)ob;
 						subscriber.write(System.currentTimeMillis() + "," + jsonob.get("msgid") + "\n");
+						System.out.println(jsonob.get("msgid"));
 						ctr++;
 						if(ctr == datapoint) {
 							subscriber.close();
@@ -71,7 +73,7 @@ public class Testclass {
 				}  
 			};
 			
-			channel.basicConsume("sahil", true, consumer);
+			channel.basicConsume("streetlight", true, consumer);
 		} catch(IOException e) {
 			e.printStackTrace();
 		} catch(TimeoutException t) {

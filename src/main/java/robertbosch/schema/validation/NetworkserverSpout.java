@@ -37,10 +37,10 @@ public class NetworkserverSpout extends BaseRichSpout {
 		// TODO Auto-generated method stub
 		try {
 			if(loraserverqueue != null && loraserverqueue.size() >0) {
-				System.out.println("................................................................entered into the condition");
+				//System.out.println("................................................................entered into the condition");
 				lorabinarydata = loraserverqueue.poll();
 				loradata = new String(lorabinarydata, StandardCharsets.UTF_8);
-				System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ lora data is: " + loradata);
+				//System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ lora data is: " + loradata);
 				obj = parser.parse(loradata);
 				jsonob = (JSONObject)obj;
 				deviceid = jsonob.get("devEUI").toString();
@@ -60,13 +60,10 @@ public class NetworkserverSpout extends BaseRichSpout {
 		// TODO Auto-generated method stub
 		this.spoutcollector = arg2;
 		parser = new JSONParser();
-		//loraserverqueue = new ConcurrentLinkedQueue<byte[]>();
-		//deviceprotoschema = new ConcurrentHashMap<String, String>();
-		//protoURLs = new ConcurrentLinkedQueue<String>();
 		RobertBoschUtils rbutils = new RobertBoschUtils();
 		rbutils.queryCatalogueServer();
 		rbutils.subscribeToNetworkServer();
-		System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ subscribed to network server");
+		//System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ subscribed to network server");
 		
 	}
 

@@ -19,7 +19,7 @@ import org.json.simple.JSONObject;
 
 import com.google.protobuf.util.JsonFormat;
 //import com.protoTest.smartcity.Pollut;
-import com.protoTest.smartcity.Sensed;
+//import com.protoTest.smartcity.Sensed;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -32,7 +32,7 @@ public class SmartcityDataSimulator implements MqttCallback {
 	static BufferedWriter publish;
 	static MqttMessage mqttpub = new MqttMessage();
 	
-	private void jsonstreetLight() {
+	public String jsonstreetLight() {
 		
 		boolean[] state = {true, false};
 		int luxOutput = ThreadLocalRandom.current().nextInt(100, 1001);
@@ -60,65 +60,72 @@ public class SmartcityDataSimulator implements MqttCallback {
 		finalobj.put("data", data);
 		
 		String packet = finalobj.toJSONString();
-		System.out.println("size of packets: " + packet.getBytes().length);
+//		try {
+//			MiddlewareAPI.pubwrtr.write(System.currentTimeMillis() + "," + msgId);
+//		} catch(IOException e) {
+//			e.printStackTrace();
+//		}
 		
-		try {
-			String topic = "sahil";
-			publish.write(System.currentTimeMillis() + "," + msgId + "\n");
-			channel.basicPublish("", topic, null, packet.getBytes());
-			
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
+		return packet;
+//		System.out.println("size of packets: " + packet.getBytes().length);
+//		
+//		try {
+//			String topic = "sahil";
+//			publish.write(System.currentTimeMillis() + "," + msgId + "\n");
+//			channel.basicPublish("", topic, null, packet.getBytes());
+//			
+//		} catch(IOException e) {
+//			e.printStackTrace();
+//		}
 	}
 	
-	private void protostreetlight() throws Exception {
-		
-		SmartcityDataSimulator simulator = new SmartcityDataSimulator();
-		boolean[] state = {true, false};
-		int luxOutput = ThreadLocalRandom.current().nextInt(100, 1001);
-		int powerconsumption = ThreadLocalRandom.current().nextInt(0, 101);
-		int casetemperature = ThreadLocalRandom.current().nextInt(1, 101);
-		int ambientlux = ThreadLocalRandom.current().nextInt(100, 1001);
-		boolean slaveAlive = state[ThreadLocalRandom.current().nextInt(0,2)];
-		int batterylevel = ThreadLocalRandom.current().nextInt(0, 5001);
-		int dataSamplingInstant = ThreadLocalRandom.current().nextInt(10000000, 99999999);
-		
-		Sensed.sensor_values.Builder sensorval = Sensed.sensor_values.newBuilder();
-		sensorval.setLuxOutput(luxOutput);
-		sensorval.setPowerConsumption(powerconsumption);
-		sensorval.setCaseTemperature(casetemperature);
-		sensorval.setAmbientLux(ambientlux);
-		sensorval.setSlaveAlive(slaveAlive);
-		sensorval.setBatteryLevel(batterylevel);
-		sensorval.setDataSamplingInstant(dataSamplingInstant);
-		
-		byte[] snsr = sensorval.build().toByteArray();
-		JSONObject ob = new JSONObject();
-		String deviceId = UUID.randomUUID().toString();
-		ob.put("devEUI", deviceId);
-		ob.put("data", snsr);
-		String packet = ob.toJSONString();
-		System.out.println("size of packets: " + packet.getBytes().length);
-		
-//		System.out.println(ob.toJSONString());
-//		Object o = Sensed.sensor_values.parseFrom(snsr);
-//		String packet=JsonFormat.printer().print((Sensed.sensor_values)o);
-//		System.out.println("packet is:" + packet);
-		
-		
-//		System.out.println("protostreet light size:" + ob.toJSONString().getBytes().length);
-//		simulator.publishToNetworkServer(ob.toJSONString().getBytes());
-		
-		try {
-			String topic = "sahil";
-			publish.write(System.currentTimeMillis() + "," + deviceId + "\n");
-			channel.basicPublish("", topic, null, packet.getBytes());
-			
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-	}
+//	private void protostreetlight() throws Exception {
+//		
+//		SmartcityDataSimulator simulator = new SmartcityDataSimulator();
+//		boolean[] state = {true, false};
+//		int luxOutput = ThreadLocalRandom.current().nextInt(100, 1001);
+//		int powerconsumption = ThreadLocalRandom.current().nextInt(0, 101);
+//		int casetemperature = ThreadLocalRandom.current().nextInt(1, 101);
+//		int ambientlux = ThreadLocalRandom.current().nextInt(100, 1001);
+//		boolean slaveAlive = state[ThreadLocalRandom.current().nextInt(0,2)];
+//		int batterylevel = ThreadLocalRandom.current().nextInt(0, 5001);
+//		int dataSamplingInstant = ThreadLocalRandom.current().nextInt(10000000, 99999999);
+//		
+//		Sensed.sensor_values.Builder sensorval = Sensed.sensor_values.newBuilder();
+//		sensorval.setLuxOutput(luxOutput);
+//		sensorval.setPowerConsumption(powerconsumption);
+//		sensorval.setCaseTemperature(casetemperature);
+//		sensorval.setAmbientLux(ambientlux);
+//		sensorval.setSlaveAlive(slaveAlive);
+//		sensorval.setBatteryLevel(batterylevel);
+//		sensorval.setDataSamplingInstant(dataSamplingInstant);
+//		
+//		byte[] snsr = sensorval.build().toByteArray();
+//		JSONObject ob = new JSONObject();
+//		String deviceId = UUID.randomUUID().toString();
+//		ob.put("devEUI", deviceId);
+//		ob.put("data", snsr);
+//		String packet = ob.toJSONString();
+//		System.out.println("size of packets: " + packet.getBytes().length);
+//		
+////		System.out.println(ob.toJSONString());
+////		Object o = Sensed.sensor_values.parseFrom(snsr);
+////		String packet=JsonFormat.printer().print((Sensed.sensor_values)o);
+////		System.out.println("packet is:" + packet);
+//		
+//		
+////		System.out.println("protostreet light size:" + ob.toJSONString().getBytes().length);
+////		simulator.publishToNetworkServer(ob.toJSONString().getBytes());
+//		
+//		try {
+//			String topic = "sahil";
+//			publish.write(System.currentTimeMillis() + "," + deviceId + "\n");
+//			channel.basicPublish("", topic, null, packet.getBytes());
+//			
+//		} catch(IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
 	
 	private void protopollution() {
 		
@@ -141,7 +148,7 @@ public class SmartcityDataSimulator implements MqttCallback {
 		
 	}
 	
-	private void jsonenergyMeter() {
+	public String jsonenergyMeter() {
 		
 		double YPhaseReactivePower = ThreadLocalRandom.current().nextDouble(5, 30);
 		double YPhaseApparentPower = ThreadLocalRandom.current().nextDouble(10, 30);
@@ -194,21 +201,24 @@ public class SmartcityDataSimulator implements MqttCallback {
 		finalobj.put("msgid", msgid);
 		finalobj.put("data", data);
 		String packet = finalobj.toJSONString();
-		try {
-			String topic = "sahil";
-			publish.write(System.currentTimeMillis() + "," + msgid + "\n");
-			channel.basicPublish("", topic, null, packet.getBytes());
-			
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			String topic = "sahil";
+//			publish.write(System.currentTimeMillis() + "," + msgid + "\n");
+//			channel.basicPublish("", topic, null, packet.getBytes());
+//			
+//		} catch(IOException e) {
+//			e.printStackTrace();
+//		}
+		return packet;
 	}
 	
 	private Channel createbrokerChannel(String deviceId) {
 		
 		ConnectionFactory connfac = new ConnectionFactory();
-		connfac.setHost("10.156.14.6");
-		connfac.setPort(5672);
+		//connfac.setHost("10.156.14.6");
+		connfac.setHost("18.219.118.74");
+		//connfac.setPort(5672);
+		connfac.setPort(12082);
 		connfac.setUsername("rbccps");
 		connfac.setPassword("rbccps@123");
 		Channel channel = null;
@@ -255,8 +265,8 @@ public class SmartcityDataSimulator implements MqttCallback {
 		//simulator emitting a single device
 		SmartcityDataSimulator obj = new SmartcityDataSimulator();
 		channel = obj.createbrokerChannel("sahil");
-//		String publishfile = "/home/etl_subsystem/publish.txt";
-		String publishfile = "/home/ubuntu/publish.txt";
+		String publishfile = "/Users/sahiltyagi/Desktop/publish.txt";
+		//String publishfile = "/home/ubuntu/publish.txt";
 		publish = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(publishfile)));
 		
 		int iterations =Integer.parseInt(args[0]);
@@ -280,6 +290,9 @@ public class SmartcityDataSimulator implements MqttCallback {
 		}
 		
 		System.out.println("complete.");
+		
+//		SmartcityDataSimulator obj = new SmartcityDataSimulator();
+//		System.out.println(obj.jsonstreetLight());
 		
 	}
 

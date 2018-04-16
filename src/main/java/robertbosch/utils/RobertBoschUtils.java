@@ -55,18 +55,15 @@ public class RobertBoschUtils implements MqttCallback {
 	public static ConcurrentHashMap<String, String> catalogue = new ConcurrentHashMap<String, String>();
 	private static List<String> list;
 	public static Channel publishchannel;
-	public static String pubTopic = "valid_data", protofiles = "/home/etl_subsystem/protos/";
+	public static String pubTopic = "data_out", protofiles = "/home/etl_subsystem/protos/";
 	//public static String pubTopic = "valid_data", protofiles = "/Users/sahiltyagi/Desktop/protos/";
 	
 	static {
 		
 		props.setProperty("host", "10.156.14.6");
-//		props.setProperty("host", "10.156.14.9");
 		props.setProperty("port", "5672");
 		props.setProperty("username", "rbccps");
 		props.setProperty("password", "rbccps@123");
-//		props.setProperty("username", "sahil");
-//		props.setProperty("password", "sahil0407");
 		props.setProperty("exchange", "amq.topic");
 		props.setProperty("bindingkey", "*.#");
 		props.setProperty("virtualhost", "/");
@@ -87,10 +84,12 @@ public class RobertBoschUtils implements MqttCallback {
 		props.setProperty("javapath", "/home/etl_subsystem/protoschema/src/main/java");
 		props.setProperty("maven", "/usr/bin/mvn");
 		props.setProperty("schemarepo", "/home/etl_subsystem/protoschema");
+		props.setProperty("protoschemajar", "/home/etl_subsystem/protoschema/target/protoschema-1.0-SNAPSHOT-jar-with-dependencies.jar");
+		props.setProperty("stormdir", "/home/etl_subsystem/apache-storm-1.0.2");
 		
 	}
 	
-	public static boolean validateSchema(String schema, String data) {
+	public static boolean validatesensorschema(String schema, String data) {
 		boolean status=false;
 		try {
 			
@@ -124,11 +123,8 @@ public class RobertBoschUtils implements MqttCallback {
 			
 			Consumer consumer = new DefaultConsumer(channel) {
 				public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-				    
-					//RabbitMQSpout.nbqueue.add(body);
 					String message = new String(body, "UTF-8");
-				    System.out.println(" [x] Received '" + message + "'");
-				    
+				    System.out.println(" [x] Received '" + message + "'");  
 				}  
 			};
 			
@@ -141,10 +137,19 @@ public class RobertBoschUtils implements MqttCallback {
 	
 	}
 	
+	public static void main(String[] args) {
+		System.out.println("starting subscribe...");
+		subscribeToBrokerData();
+	}
+	
 	public static void subscribeToBrokerData() {
 		try {
 			String deviceId=null;
 			ConnectionFactory factory = new ConnectionFactory();
+			
+			//factory.setHost("13.58.190.153");
+			//factory.setPort(12082);
+			
 			factory.setHost(props.getProperty("host"));
 			factory.setPort(Integer.parseInt(props.getProperty("port")));
 			factory.setUsername(props.getProperty("username"));
@@ -153,14 +158,15 @@ public class RobertBoschUtils implements MqttCallback {
 
 			Connection conn = factory.newConnection();
 			Channel channel = conn.createChannel();
-			channel.exchangeDeclare(props.getProperty("exchange"), deviceId, true);
+			//channel.exchangeDeclare(props.getProperty("exchange"), deviceId, true);
+			channel.exchangeDeclare(props.getProperty("exchange"), "topic", true);
 			
 			System.out.println("going to subscribe for device: " + deviceId);
 			Consumer consumer = new DefaultConsumer(channel) {
 				public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
 					if(body != null) {
-						
 						JSONmessagespout.jsonqueue.add(body);
+						//System.out.println("message:"+ new String(body, "UTF-8"));
 					}
 				}  
 			};
@@ -278,7 +284,7 @@ public class RobertBoschUtils implements MqttCallback {
 				String devId = itemobj.get("id").toString();
 				System.out.println(devId);
 				
-				//using wildcard operator to subscribe to all topics in network server
+				//using wildcard operator to subscribe to all topics
 				if(!NetworkserverSpout.deviceprotoschema.containsKey(devId)) {
 					
 					String schema = itemobj.get("data_schema").toString();
@@ -296,13 +302,9 @@ public class RobertBoschUtils implements MqttCallback {
 							
 							System.out.println(jsonob2.get("link").toString() + "  " + jsonob2.get("mainMessageName").toString());
 							NetworkserverSpout.deviceprotoschema.put(devId, jsonob2.get("link").toString() + "___" + jsonob2.get("mainMessageName").toString());
-							
-						}
-						
-					}
-					
+						}	
+					}	
 				}
-				
 			}
 			
 			System.out.println("fully read the catalogue server...");
@@ -311,76 +313,48 @@ public class RobertBoschUtils implements MqttCallback {
 		}
 	}
 	
-	private static void checkValidation() {
-		list = new ArrayList<String>();
-		//subscribeToSensorData();
-		while(true) {
-			if(list.size() > 0) {
-				int index=0;
-				while(index < list.size()) {
-					//RBCCPS_EM_1111
-					String json = list.get(index);
-					JSONParser parse = new JSONParser();
-					try {
-						Object obj = parse.parse(json);
-						JSONObject jsonob = (JSONObject)obj;
-						if(jsonob.containsKey("key")) {
-							String devId = jsonob.get("key").toString();
-							//String data = json.split(",")[1].replaceAll("]", "");
-							String data = jsonob.get("data").toString();
-							System.out.println("data is: " + data);
-							
-							boolean status = validateSchema(catalogue.get(devId), data);
-							if(status) {
-								System.out.println("Voila! It's a match for: " + list.get(index));
-							} else {
-								System.out.println("not a match for: " + list.get(index));
-							}
-							
-							list.remove(index);
-							//index++;
-						}
-//						else {
-//							System.out.println("########## key not present!");
-//						}
-						
-					} catch(ParseException p) {
-						p.printStackTrace();
-					}
-				}
-			}
-		}
-	}
-	
-	
-	public static ConcurrentLinkedQueue<byte[]> arrtest = new ConcurrentLinkedQueue<byte[]>();
-	public static void main(String[] args) throws Exception {
-		System.out.println("starting...");
-		RobertBoschUtils rb = new RobertBoschUtils();
-//		rb.subscribeToNetworkServer();
-//		System.out.println("subscribed to n/w server...");
+//	private static void validatesensordata() {
+//		list = new ArrayList<String>();
+//		//subscribeToSensorData();
 //		while(true) {
-//			if(arrtest.size() > 0) {
-//				
-//				byte[] data = arrtest.poll();
-//				String loradata = new String(data, StandardCharsets.UTF_8);
-//				System.out.println("final data: " + loradata);
-//				JSONParser parser = new JSONParser();
-//				Object obj = parser.parse(loradata);
-//				JSONObject jsonob = (JSONObject)obj;
-//				String protobinary = jsonob.get("data").toString();
-//				byte[] decode = Base64.getDecoder().decode(protobinary);
-//				
-//				Object o = Sensed.sensor_values.parseFrom(decode);
-//				String packet=JsonFormat.printer().print((Sensed.sensor_values)o);
-//				System.out.println("packet is:" + packet);
-//				
+//			if(list.size() > 0) {
+//				int index=0;
+//				while(index < list.size()) {
+//					//RBCCPS_EM_1111
+//					String json = list.get(index);
+//					JSONParser parse = new JSONParser();
+//					try {
+//						Object obj = parse.parse(json);
+//						JSONObject jsonob = (JSONObject)obj;
+//						if(jsonob.containsKey("key")) {
+//							String devId = jsonob.get("key").toString();
+//							//String data = json.split(",")[1].replaceAll("]", "");
+//							String data = jsonob.get("data").toString();
+//							System.out.println("data is: " + data);
+//							
+//							boolean status = validatesensorschema(catalogue.get(devId), data);
+//							if(status) {
+//								System.out.println("Voila! It's a match for: " + list.get(index));
+//							} else {
+//								System.out.println("not a match for: " + list.get(index));
+//							}
+//							
+//							list.remove(index);
+//							//index++;
+//						}
+////						else {
+////							System.out.println("########## key not present!");
+////						}
+//						
+//					} catch(ParseException p) {
+//						p.printStackTrace();
+//					}
+//				}
 //			}
 //		}
-		
-		rb.queryCatalogueServer();
-		
-	}
+//	}
+	
+	public static ConcurrentLinkedQueue<byte[]> arrtest = new ConcurrentLinkedQueue<byte[]>();
 
 	@Override
 	public void connectionLost(Throwable arg0) {
@@ -397,9 +371,6 @@ public class RobertBoschUtils implements MqttCallback {
 	@Override
 	public void messageArrived(String arg0, MqttMessage arg1) throws Exception {
 		// TODO Auto-generated method stub
-		//byte[] msg = arg1.getPayload();
-		//NetworkserverSpout.loraserverqueue.add(msg);
-		//arrtest.add(msg);
 		NetworkserverSpout.loraserverqueue.add(arg1.getPayload());
 		//arrtest.add(arg1.getPayload());
 	}

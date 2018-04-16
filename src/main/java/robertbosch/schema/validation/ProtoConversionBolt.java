@@ -31,25 +31,24 @@ public class ProtoConversionBolt extends BaseRichBolt {
 		// TODO Auto-generated method stub
 		device = arg0.getStringByField("deviceid");
 		data = arg0.getBinaryByField("protodata");
-		System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ device id is:" + device);
-		System.out.println("%%%%%%%%%%%%%%%%%%  key set of protoschema map:" + NetworkserverSpout.deviceprotoschema.keySet());
+		//System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ device id is:" + device);
+		//System.out.println("%%%%%%%%%%%%%%%%%%  key set of protoschema map:" + NetworkserverSpout.deviceprotoschema.keySet());
 		
 		if(data != null) {
 			
 			if(!RobertBoschUtils.catalogue.contains(device)) {
-				System.out.println("###################### querying catalogue from the bolt validator......................");
+				System.out.println("#################################################### querying catalogue from the bolt validator......................");
 				utils.queryCatalogueServer();
 			}
 			
 			System.out.println("******************** link: " + NetworkserverSpout.deviceprotoschema.get(device).split("___")[0]);
 			System.out.println("~~~~~~~~~~~~~~~~~~~~ mainmessage: " + NetworkserverSpout.deviceprotoschema.get(device).split("___")[1]);
-			//deserialize method args:(byte[] buffer, String message, String url)
-			//url___message
+			//deserialize method args:(byte[] buffer, String message, String url) and split string is url__message
 			jsondata = ProtobufDeserializer.deserialize(data, NetworkserverSpout.deviceprotoschema.get(device).split("___")[1], 
-												NetworkserverSpout.deviceprotoschema.get(device).split("___")[0]);
-			System.out.println("#################################$$$******************%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% data is: " + jsondata);
+															NetworkserverSpout.deviceprotoschema.get(device).split("___")[0]);
+			//System.out.println("#################################$$$******************%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% data is: " + jsondata);
 			
-			Values values = new Values(jsondata);
+			Values values = new Values(device, jsondata);
 			outputCollector.emit(values);
 			values.clear();
 			
@@ -77,7 +76,7 @@ public class ProtoConversionBolt extends BaseRichBolt {
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer arg0) {
 		// TODO Auto-generated method stub
-		arg0.declare(new Fields("jsondata"));
+		arg0.declare(new Fields("deviceid", "jsondata"));
 	}
 
 }
