@@ -19,7 +19,7 @@ import org.json.simple.parser.ParseException;
 
 import robertbosch.utils.RobertBoschUtils;
 
-public class NetworkserverSpout extends BaseRichSpout {
+public class Networkserverspout extends BaseRichSpout {
 
 	private static final long serialVersionUID = 1L;
 	SpoutOutputCollector spoutcollector;

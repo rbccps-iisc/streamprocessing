@@ -41,11 +41,11 @@ public class ProtoConversionBolt extends BaseRichBolt {
 				utils.queryCatalogueServer();
 			}
 			
-			System.out.println("******************** link: " + NetworkserverSpout.deviceprotoschema.get(device).split("___")[0]);
-			System.out.println("~~~~~~~~~~~~~~~~~~~~ mainmessage: " + NetworkserverSpout.deviceprotoschema.get(device).split("___")[1]);
+			System.out.println("******************** link: " + Networkserverspout.deviceprotoschema.get(device).split("___")[0]);
+			System.out.println("~~~~~~~~~~~~~~~~~~~~ mainmessage: " + Networkserverspout.deviceprotoschema.get(device).split("___")[1]);
 			//deserialize method args:(byte[] buffer, String message, String url) and split string is url__message
-			jsondata = ProtobufDeserializer.deserialize(data, NetworkserverSpout.deviceprotoschema.get(device).split("___")[1], 
-															NetworkserverSpout.deviceprotoschema.get(device).split("___")[0]);
+			jsondata = ProtobufDeserializer.deserialize(data, Networkserverspout.deviceprotoschema.get(device).split("___")[1], 
+															Networkserverspout.deviceprotoschema.get(device).split("___")[0]);
 			//System.out.println("#################################$$$******************%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% data is: " + jsondata);
 			
 			Values values = new Values(device, jsondata);

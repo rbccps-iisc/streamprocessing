@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import robertbosch.schema.validation.NetworkserverSpout;
+import robertbosch.schema.validation.Networkserverspout;
 import robertbosch.schema.validation.ProtoConversionBolt;
 
 public class ProtobufDeserializer {

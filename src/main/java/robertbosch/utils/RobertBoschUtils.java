@@ -48,7 +48,7 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
 import robertbosch.schema.validation.JSONmessagespout;
-import robertbosch.schema.validation.NetworkserverSpout;
+import robertbosch.schema.validation.Networkserverspout;
 
 public class RobertBoschUtils implements MqttCallback {
 	public static Properties props = new Properties();
@@ -285,7 +285,7 @@ public class RobertBoschUtils implements MqttCallback {
 				System.out.println(devId);
 				
 				//using wildcard operator to subscribe to all topics
-				if(!NetworkserverSpout.deviceprotoschema.containsKey(devId)) {
+				if(!Networkserverspout.deviceprotoschema.containsKey(devId)) {
 					
 					String schema = itemobj.get("data_schema").toString();
 					catalogue.put(devId, schema);
@@ -301,7 +301,7 @@ public class RobertBoschUtils implements MqttCallback {
 						if(jsonob2.keySet().contains("mainMessageName")) {
 							
 							System.out.println(jsonob2.get("link").toString() + "  " + jsonob2.get("mainMessageName").toString());
-							NetworkserverSpout.deviceprotoschema.put(devId, jsonob2.get("link").toString() + "___" + jsonob2.get("mainMessageName").toString());
+							Networkserverspout.deviceprotoschema.put(devId, jsonob2.get("link").toString() + "___" + jsonob2.get("mainMessageName").toString());
 						}	
 					}	
 				}
@@ -371,7 +371,7 @@ public class RobertBoschUtils implements MqttCallback {
 	@Override
 	public void messageArrived(String arg0, MqttMessage arg1) throws Exception {
 		// TODO Auto-generated method stub
-		NetworkserverSpout.loraserverqueue.add(arg1.getPayload());
+		Networkserverspout.loraserverqueue.add(arg1.getPayload());
 		//arrtest.add(arg1.getPayload());
 	}
 	

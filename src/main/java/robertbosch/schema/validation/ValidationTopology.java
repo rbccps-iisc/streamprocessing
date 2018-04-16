@@ -12,7 +12,7 @@ public class ValidationTopology {
 	public static void main(String[] args) {
 		TopologyBuilder builder = new TopologyBuilder();
 		builder.setSpout("json_spout", new JSONmessagespout());
-		builder.setSpout("proto_spout", new NetworkserverSpout());
+		builder.setSpout("proto_spout", new Networkserverspout());
 		builder.setBolt("proto_to_json_bolt", new ProtoConversionBolt()).shuffleGrouping("proto_spout");
 		builder.setBolt("validator_bolt", new SchemaValidatorBolt()).shuffleGrouping("proto_to_json_bolt").shuffleGrouping("json_spout");
 		
@@ -28,7 +28,7 @@ public class ValidationTopology {
 		}
 		cluster.shutdown();
 		
-		//running in remote mode
+		//running in remote modes
 //		try {
 //			StormSubmitter.submitTopology("Validation topology", config, builder.createTopology());
 //		} catch(InvalidTopologyException invalid) {
