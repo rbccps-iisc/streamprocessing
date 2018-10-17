@@ -1,4 +1,4 @@
-package robertbosch.schema.validation;
+package robertbosch.schema.validationservice;
 
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
@@ -7,26 +7,30 @@ import org.apache.storm.generated.AlreadyAliveException;
 import org.apache.storm.generated.AuthorizationException;
 import org.apache.storm.generated.InvalidTopologyException;
 import org.apache.storm.topology.TopologyBuilder;
+import org.apache.storm.tuple.Fields;
 
-public class ValidationTopology {
+public class ValidationServiceTopology {
 	public static void main(String[] args) {
 		TopologyBuilder builder = new TopologyBuilder();
-		builder.setSpout("json_spout", new JSONmessagespout());
-		builder.setSpout("proto_spout", new Networkserverspout());
-		builder.setBolt("proto_to_json_bolt", new ProtoConversionBolt()).shuffleGrouping("proto_spout");
-		builder.setBolt("validator_bolt", new SchemaValidatorBolt()).shuffleGrouping("proto_to_json_bolt").shuffleGrouping("json_spout");
-		
+		builder.setSpout("json_spout", new BatchGeneratorSpout());
+		builder.setBolt("validator_bolt", new SchemaValidatorBolt()).shuffleGrouping("json_spout");
+		builder.setBolt("counter_bolt", new CounterBolt()).fieldsGrouping("validator_bolt",new Fields("deviceid"));
 		Config config = new Config();
 		
 		//running in local mode
-		LocalCluster cluster = new LocalCluster();
-		cluster.submitTopology("validationTopology", config, builder.createTopology());
+//		LocalCluster cluster = new LocalCluster();
+//		cluster.submitTopology("validationServiceTopology", config, builder.createTopology());
+		Config conf = new Config();
+		conf.setNumWorkers(2);
+		
+		
 		try {
-			Thread.sleep(1000000000);
-		} catch(InterruptedException e) {
+			StormSubmitter.submitTopology(args[0],
+					config, builder.createTopology());
+		} catch(AlreadyAliveException | InvalidTopologyException | AuthorizationException e) {
 			e.printStackTrace();
 		}
-		cluster.shutdown();
+//		cluster.shutdown();
 		
 		//running in remote modes
 //		try {

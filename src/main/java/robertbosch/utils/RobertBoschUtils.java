@@ -4,19 +4,31 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeoutException;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -24,7 +36,19 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.common.transport.TransportAddress;
+import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.sort.FieldSortBuilder;
+import org.elasticsearch.search.sort.SortOrder;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -37,7 +61,6 @@ import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.google.protobuf.util.JsonFormat;
-//import com.protoTest.smartcity.Sensed;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -49,9 +72,13 @@ import com.rabbitmq.client.Envelope;
 
 import robertbosch.schema.validation.JSONmessagespout;
 import robertbosch.schema.validation.Networkserverspout;
+import robertbosch.schema.validationservice.BatchGeneratorSpout;
+
+
 
 public class RobertBoschUtils implements MqttCallback {
 	public static Properties props = new Properties();
+	public static Boolean loadingDone=false;
 	public static ConcurrentHashMap<String, String> catalogue = new ConcurrentHashMap<String, String>();
 	private static List<String> list;
 	public static Channel publishchannel;
@@ -139,7 +166,7 @@ public class RobertBoschUtils implements MqttCallback {
 	
 	public static void main(String[] args) {
 		System.out.println("starting subscribe...");
-		subscribeToBrokerData();
+		getBatch();
 	}
 	
 	public static void subscribeToBrokerData() {
@@ -180,6 +207,101 @@ public class RobertBoschUtils implements MqttCallback {
 		} catch(TimeoutException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	
+	public static void getBatch() {
+		
+		try {
+			TransportClient  client = null;
+			client = new PreBuiltTransportClient(Settings.EMPTY)
+			        .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("localhost"), 9300));
+			
+			//TODO:later change this to currentTime....
+			String dateString="2017-11-15 14:13:12";
+			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+			formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
+			Date toDate= (Date)formatter.parse(dateString);
+			
+		     
+			
+			
+//			System.out.println("ToDate:" + toDate.toString() + " DateString:" + dateString);
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(toDate);
+			cal.add(Calendar.MINUTE, -2);
+			Date fromDate = cal.getTime();
+//			System.out.println("FromDate:" + fromDate.toString());
+			//check what is timestamp field in elastic search for the CDX stack
+			QueryBuilder qb =QueryBuilders.rangeQuery("postDate").from(fromDate.toInstant().toEpochMilli()).to(toDate.toInstant().toEpochMilli());
+			SearchResponse searchResponse = client.prepareSearch("tweetindex").setPostFilter(qb).setFrom(0).setSize(3000).get();
+			String response = searchResponse.toString();
+			SearchHits hits=searchResponse.getHits();
+			Object obj;
+			JSONParser parser = new JSONParser();
+			for(SearchHit h:hits.getHits()) {
+				Map m=h.getSource();
+				org.json.JSONObject jsonObject=new org.json.JSONObject(m);
+				String jsonString=jsonObject.toString();
+				BatchGeneratorSpout.jsonqueue.add(jsonString.getBytes());
+//				System.out.println("JsonString:" + jsonString);
+			}
+			
+			System.out.println("Batch Created");
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	public static void getScrollBatches() {
+		try {
+			TransportClient  client = null;
+			client = new PreBuiltTransportClient(Settings.EMPTY)
+			        .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("localhost"), 5601));//TODO:change this to 5601 from 9300 which is the default elastic search port in CDX deployment
+										
+			
+			//FOR DEBUGGING 
+//			String dateString="2017-11-15 14:13:12";
+//			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+//			formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
+			
+			
+		
+			Date toDate=new Date(); 
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(toDate);
+			cal.add(Calendar.MINUTE, -2);
+			Date fromDate = cal.getTime();
+//			System.out.println("FromDate:" + fromDate.toString());
+			
+			//TODO: confirm the Timestamp field for each message
+			QueryBuilder qb =QueryBuilders.rangeQuery("postDate").from(fromDate.toInstant().toEpochMilli()).to(toDate.toInstant().toEpochMilli());
+			
+			//removed index name from prepareSearch for it to search across all indexes
+			SearchResponse scrollResp = client.prepareSearch()
+			        .addSort(FieldSortBuilder.DOC_FIELD_NAME, SortOrder.ASC)
+			        .setScroll(new TimeValue(60000))
+			        .setQuery(qb)
+			        .setSize(10000).get(); 
+			
+			do {
+			    for (SearchHit h : scrollResp.getHits().getHits()) {
+			    	Map m=h.getSource();
+					org.json.JSONObject jsonObject=new org.json.JSONObject(m);
+					String jsonString=jsonObject.toString();
+					BatchGeneratorSpout.jsonqueue.add(jsonString.getBytes());
+//					System.out.println("JsonString:" + jsonString);
+			    }
+
+			    scrollResp = client.prepareSearchScroll(scrollResp.getScrollId()).setScroll(new TimeValue(60000)).execute().actionGet();
+			} while(scrollResp.getHits().getHits().length != 0);
+		
+		}catch(Exception e) {
+			e.printStackTrace();
+			
+		}
+		
 	}
 	
 	public void subscribeToNetworkServer() {
@@ -373,6 +495,193 @@ public class RobertBoschUtils implements MqttCallback {
 		// TODO Auto-generated method stub
 		Networkserverspout.loraserverqueue.add(arg1.getPayload());
 		//arrtest.add(arg1.getPayload());
+	}
+
+	public static synchronized void loadCatalogue() {
+		
+		if(!loadingDone) {
+			// Create a trust manager that does not validate certificate chains
+			TrustManager[] trustAllCerts = new TrustManager[]{
+			    (TrustManager) new X509TrustManager() {
+			        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+			            return null;
+			        }
+			        public void checkClientTrusted(
+			            java.security.cert.X509Certificate[] certs, String authType) {
+			        }
+			        public void checkServerTrusted(
+			            java.security.cert.X509Certificate[] certs, String authType) {
+			        }
+			    }
+			};
+
+			// Install the all-trusting trust manager
+			try {
+			    SSLContext sc = SSLContext.getInstance("SSL");
+			    sc.init(null, trustAllCerts, new java.security.SecureRandom());
+			    HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+			} catch (Exception e) {
+
+			}
+			
+		String newDummySchema="{\n" + 
+				"  \"definitions\": {},\n" + 
+				"  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n" + 
+				"  \"$id\": \"http://example.com/root.json\",\n" + 
+				"  \"type\": \"object\",\n" + 
+				"  \"title\": \"The Root Schema\",\n" + 
+				"  \"required\": [\n" + 
+				"    \"key\",\n" + 
+				"    \"postDate\",\n" + 
+				"    \"content\",\n" + 
+				"    \"age\"\n" + 
+				"  ],\n" + 
+				"  \"properties\": {\n" + 
+				"    \"key\": {\n" + 
+				"      \"$id\": \"#/properties/key\",\n" + 
+				"      \"type\": \"string\",\n" + 
+				"      \"title\": \"The Key Schema\",\n" + 
+				"      \"default\": \"\",\n" + 
+				"      \"examples\": [\n" + 
+				"        \"tweetSensor1\"\n" + 
+				"      ],\n" + 
+				"      \"pattern\": \"^(.*)$\"\n" + 
+				"    },\n" + 
+				"    \"postDate\": {\n" + 
+				"      \"$id\": \"#/properties/postDate\",\n" + 
+				"      \"type\": \"string\",\n" + 
+				"      \"title\": \"The Postdate Schema\",\n" + 
+				"      \"default\": \"\",\n" + 
+				"      \"examples\": [\n" + 
+				"        \"2009-11-15T14:12:12\"\n" + 
+				"      ],\n" + 
+				"      \"pattern\": \"^(.*)$\"\n" + 
+				"    },\n" + 
+				"    \"content\": {\n" + 
+				"      \"$id\": \"#/properties/content\",\n" + 
+				"      \"type\": \"string\",\n" + 
+				"      \"title\": \"The Content Schema\",\n" + 
+				"      \"default\": \"\",\n" + 
+				"      \"examples\": [\n" + 
+				"        \"Hello World!\"\n" + 
+				"      ],\n" + 
+				"      \"pattern\": \"^(.*)$\"\n" + 
+				"    },\n" + 
+				"    \"age\": {\n" + 
+				"      \"$id\": \"#/properties/age\",\n" + 
+				"      \"type\": \"string\",\n" + 
+				"      \"title\": \"The Age Schema\",\n" + 
+				"      \"default\": \"\",\n" + 
+				"      \"examples\": [\n" + 
+				"        \"23\"\n" + 
+				"      ],\n" + 
+				"      \"pattern\": \"^(.*)$\"\n" + 
+				"    }\n" + 
+				"  }\n" + 
+				"}";
+		
+		//Adding a dummy schema for testing
+		RobertBoschUtils.catalogue.put("tweetSensor1", newDummySchema);
+		String Response = "";
+		//TODO: read catalog url from a config file
+		String catalogueUrl = "https://localhost:8443/api/1.0.0/cat";
+		//READING the whole catalog
+		try {
+		URL url = new URL(catalogueUrl);
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		con.setRequestMethod("GET");
+		int status = con.getResponseCode();
+		BufferedReader in = new BufferedReader(
+				  new InputStreamReader(con.getInputStream()));
+				String inputLine;
+				StringBuffer content = new StringBuffer();
+				while ((inputLine = in.readLine()) != null) {
+				    content.append(inputLine);
+				}
+				in.close();
+				con.disconnect();
+				Response=content.toString();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		//Parse the content response to populate the in memory catalogue..TODO:Add locks to share in memory catalogue
+		final org.json.JSONObject obj = new org.json.JSONObject(Response);
+		final org.json.JSONArray catalogueEntries = obj.getJSONArray("items");
+		final int n = catalogueEntries.length();
+	    for (int i = 0; i < n; ++i) {
+	      final org.json.JSONObject catalogueEntry = catalogueEntries.getJSONObject(i);
+//	      System.out.println(person.getInt("id"));
+//	      System.out.println(catalogueEntry.toString());
+	      RobertBoschUtils.catalogue.put(catalogueEntry.getString("id"), catalogueEntry.toString());
+	    }
+		//setting flag so that other threads don't load the whole catalog again
+	    loadingDone=true;
+	    
+	    
+		}//if ended
+	}
+	
+	//Check if this code works...
+	public static String queryCatalog(String deviceId) {
+		// Create a trust manager that does not validate certificate chains
+				TrustManager[] trustAllCerts = new TrustManager[]{
+				    (TrustManager) new X509TrustManager() {
+				        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+				            return null;
+				        }
+				        public void checkClientTrusted(
+				            java.security.cert.X509Certificate[] certs, String authType) {
+				        }
+				        public void checkServerTrusted(
+				            java.security.cert.X509Certificate[] certs, String authType) {
+				        }
+				    }
+				};
+
+				// Install the all-trusting trust manager
+				try {
+				    SSLContext sc = SSLContext.getInstance("SSL");
+				    sc.init(null, trustAllCerts, new java.security.SecureRandom());
+				    HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+				} catch (Exception e) {
+
+				}
+				
+		String jsonSchema="";
+		String Response = "";
+		String catalogueUrl = "https://localhost:8443/api/1.0.0/cat?id="+ deviceId;
+		//READING the whole catalog
+		try {
+		URL url = new URL(catalogueUrl);
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		con.setRequestMethod("GET");
+		int status = con.getResponseCode();
+		BufferedReader in = new BufferedReader(
+				  new InputStreamReader(con.getInputStream()));
+				String inputLine;
+				StringBuffer content = new StringBuffer();
+				while ((inputLine = in.readLine()) != null) {
+				    content.append(inputLine);
+				}
+				in.close();
+				con.disconnect();
+				Response=content.toString();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		//parse the response to extract the catalog entry..
+		final org.json.JSONObject obj = new org.json.JSONObject(Response);
+		final org.json.JSONArray catalogueEntries = obj.getJSONArray("items");
+		final int n = catalogueEntries.length();
+	    for (int i = 0; i < n; ++i) {
+	      final org.json.JSONObject catalogueEntry = catalogueEntries.getJSONObject(i);
+	      jsonSchema = catalogueEntry.toString();
+	      break;
+	    }		
+				
+		return jsonSchema;		
 	}
 	
 }

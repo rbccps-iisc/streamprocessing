@@ -27,8 +27,8 @@ public class KongSubAPI {
 	public static void main(String[] args) {
 		System.out.println("going to start...");
 		try {
-			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("/Users/sahiltyagi/Desktop/subscribe10000.txt")));
-			int itr=10;
+			final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("/Users/sahiltyagi/Desktop/subscribe10000.txt")));
+			final int itr=10;
 			
 			ConnectionFactory factory = new ConnectionFactory();
 			factory.setHost("52.14.204.82");

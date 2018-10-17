@@ -1,4 +1,4 @@
-package robertbosch.schema.validation;
+package robertbosch.schema.validationservice;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
@@ -16,7 +16,7 @@ import org.json.simple.parser.ParseException;
 
 import robertbosch.utils.RobertBoschUtils;
 
-public class JSONmessagespout extends BaseRichSpout {
+public class BatchGeneratorSpout extends BaseRichSpout {
 	
 	private static final long serialVersionUID = 1L;
 	SpoutOutputCollector spoutcollector;
@@ -29,21 +29,36 @@ public class JSONmessagespout extends BaseRichSpout {
 	@Override
 	public void nextTuple() {
 		// TODO Auto-generated method stub
-		if(jsonqueue !=null && !jsonqueue.isEmpty()) {
+		RobertBoschUtils.getScrollBatches();
+		long start=System.currentTimeMillis();
+		//logic to split the batch into messages and forward it to validator
+		while(jsonqueue !=null && !jsonqueue.isEmpty()) {
 			byte[] buffer = jsonqueue.poll();
 			try {
 				String data = new String(buffer, "UTF-8");
 				obj = parser.parse(data);
 				jsonob = (JSONObject)obj;
 				
-				Values vals = new Values(jsonob.get("key"), jsonob.get("data"));
+				Values vals = new Values(jsonob.get("key"), jsonob.toString());//check if only data needs to be verified
 				spoutcollector.emit(vals);
-				vals.clear();
 			} catch(UnsupportedEncodingException e) {
 				e.printStackTrace();
 			} catch(ParseException p) {
 				p.printStackTrace();
 			}
+		}
+		
+		
+		//calculating Total time and converting it to seconds
+		long timeToProcess=(System.currentTimeMillis()-start)/1000;
+		
+		
+		//TODO: Logic for Multithreaded spout
+		try {
+			Thread.sleep(120000-timeToProcess);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -53,8 +68,7 @@ public class JSONmessagespout extends BaseRichSpout {
 		spoutcollector = arg2;
 		jsonqueue = new ConcurrentLinkedQueue<byte[]>();
 		parser = new JSONParser();
-		//subscribe to rabbitMQ broker
-		RobertBoschUtils.subscribeToBrokerData();
+		
 	}
 
 	@Override
