@@ -29,7 +29,7 @@ public class BatchGeneratorSpout extends BaseRichSpout {
 	@Override
 	public void nextTuple() {
 		// TODO Auto-generated method stub
-		RobertBoschUtils.getScrollBatches();
+		RobertBoschUtils.getBatch();
 		long start=System.currentTimeMillis();
 		//logic to split the batch into messages and forward it to validator
 		while(jsonqueue !=null && !jsonqueue.isEmpty()) {

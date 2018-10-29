@@ -69,6 +69,18 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
+import com.aerospike.client.AerospikeClient;
+import com.aerospike.client.Host;
+import com.aerospike.client.policy.ClientPolicy;
+import com.aerospike.client.Key;
+import com.aerospike.client.Bin;
+import com.aerospike.client.Record;
+import com.aerospike.client.query.Statement;
+import com.aerospike.client.query.Filter;
+import com.aerospike.client.Value;
+import com.aerospike.client.query.RecordSet;
+import com.aerospike.client.task.IndexTask;
+import com.aerospike.client.query.IndexType;
 
 import robertbosch.schema.validation.JSONmessagespout;
 import robertbosch.schema.validation.Networkserverspout;
@@ -211,45 +223,35 @@ public class RobertBoschUtils implements MqttCallback {
 	
 	
 	public static void getBatch() {
-		
+
+		AerospikeClient client = new AerospikeClient("localhost", 3000);
+		Statement stmt = new Statement();
+
+		//TODO:confirm namespace and name in CDX deployment
+		stmt.setNamespace("test");
+		stmt.setSetName("demo1");
+		long endEpoc=System.currentTimeMillis();
+		//create batch from messages from last two minutes
+		long startEpoc=endEpoc-120000;
+		stmt.setFilters(Filter.range("timestamp", startEpoc,endEpoc));
+		// Execute the query.
+		RecordSet recordSet = client.query(null, stmt);
+		// Process the record set.
 		try {
-			TransportClient  client = null;
-			client = new PreBuiltTransportClient(Settings.EMPTY)
-			        .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("localhost"), 9300));
-			
-			//TODO:later change this to currentTime....
-			String dateString="2017-11-15 14:13:12";
-			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-			formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
-			Date toDate= (Date)formatter.parse(dateString);
-			
-		     
-			
-			
-//			System.out.println("ToDate:" + toDate.toString() + " DateString:" + dateString);
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(toDate);
-			cal.add(Calendar.MINUTE, -2);
-			Date fromDate = cal.getTime();
-//			System.out.println("FromDate:" + fromDate.toString());
-			//check what is timestamp field in elastic search for the CDX stack
-			QueryBuilder qb =QueryBuilders.rangeQuery("postDate").from(fromDate.toInstant().toEpochMilli()).to(toDate.toInstant().toEpochMilli());
-			SearchResponse searchResponse = client.prepareSearch("tweetindex").setPostFilter(qb).setFrom(0).setSize(3000).get();
-			String response = searchResponse.toString();
-			SearchHits hits=searchResponse.getHits();
-			Object obj;
-			JSONParser parser = new JSONParser();
-			for(SearchHit h:hits.getHits()) {
-				Map m=h.getSource();
-				org.json.JSONObject jsonObject=new org.json.JSONObject(m);
+			while (recordSet != null && recordSet.next()) {
+				Key key = recordSet.getKey();
+				Record record = recordSet.getRecord();
+				org.json.JSONObject jsonObject=new org.json.JSONObject(record.bins);
 				String jsonString=jsonObject.toString();
 				BatchGeneratorSpout.jsonqueue.add(jsonString.getBytes());
-//				System.out.println("JsonString:" + jsonString);
+//                System.out.println(jsonString);
 			}
-			
-			System.out.println("Batch Created");
-		}catch(Exception e) {
+		}
+		catch(Exception e){
 			e.printStackTrace();
+		}
+		finally {
+			recordSet.close();
 		}
 	}
 	
