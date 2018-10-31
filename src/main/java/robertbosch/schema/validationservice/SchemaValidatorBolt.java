@@ -11,6 +11,19 @@ import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
+import com.aerospike.client.AerospikeClient;
+import com.aerospike.client.Host;
+import com.aerospike.client.policy.ClientPolicy;
+import com.aerospike.client.Key;
+import com.aerospike.client.Bin;
+import com.aerospike.client.Record;
+import com.aerospike.client.query.Statement;
+import com.aerospike.client.query.Filter;
+import com.aerospike.client.Value;
+import com.aerospike.client.query.RecordSet;
+import com.aerospike.client.task.IndexTask;
+import com.aerospike.client.query.IndexType;
+
 
 import robertbosch.utils.RobertBoschUtils;
 
@@ -40,33 +53,46 @@ public class SchemaValidatorBolt extends BaseRichBolt {
 		
 			status = RobertBoschUtils.validatesensorschema(jsonSchema, jsondata);
 		}
-		
+
+		String checked="true";
+		String valid="false";
 		//push the data to broker from here...
 		if(status) {
 			System.out.println("the following data was successfully validated:" + jsondata);
-			//TODO:mark as valid json and push it to elastic search
+			//TODO:mark as valid json and push it to backend
+			valid="true";
 		}
 		else
 		{
-//			System.out.println("INVALID json:" + jsondata);
-			//TODO:push this json marked as invalidated back to elastic search
-			Long count=this.invalidMessageCounter.get(deviceId);
-			if(count==null) {
-				count=0L;
-			}else
-			{
-				count++;
-			}
-			invalidMessageCounter.put(deviceId, count);
+			System.out.println("INVALID json:" + jsondata);
+			//TODO:push this json marked as invalidated back to backend
+//			Long count=this.invalidMessageCounter.get(deviceId);
+//			if(count==null) {
+//				count=0L;
+//			}else
+//			{
+//				count++;
+//			}
+//			invalidMessageCounter.put(deviceId, count);
 			
 		}
+
+		AerospikeClient client = new AerospikeClient("localhost", 3000);
+		org.json.JSONObject jsonObject=new org.json.JSONObject(jsondata);
+		jsonObject.put("valid",valid);
+		jsonObject.put("checked",checked);
+		String jsonString=jsonObject.toString();
+		Key validationKey = new Key("test", "demo1", jsonObject.get("id").toString() + "-" + jsonObject.get("timestamp") +"-Validated");
+		Bin bodyBin=new Bin("body",jsonString);
+		client.put(null,validationKey,bodyBin);
+
+		client.close();
 		
-		
-		for(Entry<String, Long> entry: invalidMessageCounter.entrySet()) {
-			Values vals = new Values(entry.getKey(),entry.getValue());
+//		for(Entry<String, Long> entry: invalidMessageCounter.entrySet()) {
+			Values vals = new Values(deviceId,1);
 			
 			outputCollector.emit(vals);
-		}
+//		}
 	}
 
 	@Override

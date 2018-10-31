@@ -39,7 +39,7 @@ public class BatchGeneratorSpout extends BaseRichSpout {
 				obj = parser.parse(data);
 				jsonob = (JSONObject)obj;
 				
-				Values vals = new Values(jsonob.get("key"), jsonob.toString());//check if only data needs to be verified
+				Values vals = new Values(jsonob.get("id"), jsonob.toString());//check if only data needs to be verified
 				spoutcollector.emit(vals);
 			} catch(UnsupportedEncodingException e) {
 				e.printStackTrace();

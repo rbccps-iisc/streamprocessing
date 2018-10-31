@@ -230,9 +230,15 @@ public class RobertBoschUtils implements MqttCallback {
 		//TODO:confirm namespace and name in CDX deployment
 		stmt.setNamespace("test");
 		stmt.setSetName("demo1");
+
 		long endEpoc=System.currentTimeMillis();
 		//create batch from messages from last two minutes
 		long startEpoc=endEpoc-120000;
+
+		//FOR DEMO and DEBUGGING
+		endEpoc=1540669228;
+		startEpoc=1540646228;
+
 		stmt.setFilters(Filter.range("timestamp", startEpoc,endEpoc));
 		// Execute the query.
 		RecordSet recordSet = client.query(null, stmt);
@@ -253,6 +259,7 @@ public class RobertBoschUtils implements MqttCallback {
 		finally {
 			recordSet.close();
 		}
+		client.close();
 	}
 	
 	
@@ -526,64 +533,85 @@ public class RobertBoschUtils implements MqttCallback {
 
 			}
 			
-		String newDummySchema="{\n" + 
-				"  \"definitions\": {},\n" + 
-				"  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n" + 
-				"  \"$id\": \"http://example.com/root.json\",\n" + 
-				"  \"type\": \"object\",\n" + 
-				"  \"title\": \"The Root Schema\",\n" + 
-				"  \"required\": [\n" + 
-				"    \"key\",\n" + 
-				"    \"postDate\",\n" + 
-				"    \"content\",\n" + 
-				"    \"age\"\n" + 
-				"  ],\n" + 
-				"  \"properties\": {\n" + 
-				"    \"key\": {\n" + 
-				"      \"$id\": \"#/properties/key\",\n" + 
-				"      \"type\": \"string\",\n" + 
-				"      \"title\": \"The Key Schema\",\n" + 
-				"      \"default\": \"\",\n" + 
-				"      \"examples\": [\n" + 
-				"        \"tweetSensor1\"\n" + 
-				"      ],\n" + 
-				"      \"pattern\": \"^(.*)$\"\n" + 
-				"    },\n" + 
-				"    \"postDate\": {\n" + 
-				"      \"$id\": \"#/properties/postDate\",\n" + 
-				"      \"type\": \"string\",\n" + 
-				"      \"title\": \"The Postdate Schema\",\n" + 
-				"      \"default\": \"\",\n" + 
-				"      \"examples\": [\n" + 
-				"        \"2009-11-15T14:12:12\"\n" + 
-				"      ],\n" + 
-				"      \"pattern\": \"^(.*)$\"\n" + 
-				"    },\n" + 
-				"    \"content\": {\n" + 
-				"      \"$id\": \"#/properties/content\",\n" + 
-				"      \"type\": \"string\",\n" + 
-				"      \"title\": \"The Content Schema\",\n" + 
-				"      \"default\": \"\",\n" + 
-				"      \"examples\": [\n" + 
-				"        \"Hello World!\"\n" + 
-				"      ],\n" + 
-				"      \"pattern\": \"^(.*)$\"\n" + 
-				"    },\n" + 
-				"    \"age\": {\n" + 
-				"      \"$id\": \"#/properties/age\",\n" + 
-				"      \"type\": \"string\",\n" + 
-				"      \"title\": \"The Age Schema\",\n" + 
-				"      \"default\": \"\",\n" + 
-				"      \"examples\": [\n" + 
-				"        \"23\"\n" + 
-				"      ],\n" + 
-				"      \"pattern\": \"^(.*)$\"\n" + 
-				"    }\n" + 
-				"  }\n" + 
+		String newDummySchema="{\n" +
+				"  \"definitions\": {},\n" +
+				"  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n" +
+				"  \"$id\": \"http://example.com/root.json\",\n" +
+				"  \"type\": \"object\",\n" +
+				"  \"title\": \"The Root Schema\",\n" +
+				"  \"required\": [\n" +
+				"    \"valid\",\n" +
+				"    \"checked\",\n" +
+				"    \"id\",\n" +
+				"    \"bin1\",\n" +
+				"    \"bin2\",\n" +
+				"    \"timestamp\"\n" +
+				"  ],\n" +
+				"  \"properties\": {\n" +
+				"    \"valid\": {\n" +
+				"      \"$id\": \"#/properties/valid\",\n" +
+				"      \"type\": \"string\",\n" +
+				"      \"title\": \"The Valid Schema\",\n" +
+				"      \"default\": \"\",\n" +
+				"      \"examples\": [\n" +
+				"        \"true\"\n" +
+				"      ],\n" +
+				"      \"pattern\": \"^(.*)$\"\n" +
+				"    },\n" +
+				"    \"checked\": {\n" +
+				"      \"$id\": \"#/properties/checked\",\n" +
+				"      \"type\": \"string\",\n" +
+				"      \"title\": \"The Checked Schema\",\n" +
+				"      \"default\": \"\",\n" +
+				"      \"examples\": [\n" +
+				"        \"true\"\n" +
+				"      ],\n" +
+				"      \"pattern\": \"^(.*)$\"\n" +
+				"    },\n" +
+				"    \"id\": {\n" +
+				"      \"$id\": \"#/properties/id\",\n" +
+				"      \"type\": \"string\",\n" +
+				"      \"title\": \"The Id Schema\",\n" +
+				"      \"default\": \"\",\n" +
+				"      \"examples\": [\n" +
+				"        \"Sensor0\"\n" +
+				"      ],\n" +
+				"      \"pattern\": \"^(.*)$\"\n" +
+				"    },\n" +
+				"    \"bin1\": {\n" +
+				"      \"$id\": \"#/properties/bin1\",\n" +
+				"      \"type\": \"string\",\n" +
+				"      \"title\": \"The Bin1 Schema\",\n" +
+				"      \"default\": \"\",\n" +
+				"      \"examples\": [\n" +
+				"        \"value1\"\n" +
+				"      ],\n" +
+				"      \"pattern\": \"^(.*)$\"\n" +
+				"    },\n" +
+				"    \"bin2\": {\n" +
+				"      \"$id\": \"#/properties/bin2\",\n" +
+				"      \"type\": \"string\",\n" +
+				"      \"title\": \"The Bin2 Schema\",\n" +
+				"      \"default\": \"\",\n" +
+				"      \"examples\": [\n" +
+				"        \"value4\"\n" +
+				"      ],\n" +
+				"      \"pattern\": \"^(.*)$\"\n" +
+				"    },\n" +
+				"    \"timestamp\": {\n" +
+				"      \"$id\": \"#/properties/timestamp\",\n" +
+				"      \"type\": \"integer\",\n" +
+				"      \"title\": \"The Timestamp Schema\",\n" +
+				"      \"default\": 0,\n" +
+				"      \"examples\": [\n" +
+				"        1540657228\n" +
+				"      ]\n" +
+				"    }\n" +
+				"  }\n" +
 				"}";
 		
 		//Adding a dummy schema for testing
-		RobertBoschUtils.catalogue.put("tweetSensor1", newDummySchema);
+		RobertBoschUtils.catalogue.put("Sensor0", newDummySchema);
 		String Response = "";
 		//TODO: read catalog url from a config file
 		String catalogueUrl = "https://localhost:8443/api/1.0.0/cat";

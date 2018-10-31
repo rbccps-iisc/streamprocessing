@@ -37,7 +37,7 @@ public class CounterBolt extends BaseRichBolt {
 		}
 		invalidMessageCounter.put(deviceId, totalCount+count);
 
-		if((totalCount+count)>10) {
+		if((totalCount+count)>=10) {
 			System.out.println("Found Anomalous Sensor" + deviceId);
 			invalidMessageCounter.put(deviceId,0L);
 			
