@@ -22,7 +22,7 @@
         		</descriptorRefs>
       		</configuration>
     	</plugin>
-    	    
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -34,75 +34,89 @@
       </plugin>
   	</plugins>
   </build>
-  
-  
+
+
   <dependencies>
-  
-  
+
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.storm</groupId>
       <artifactId>storm-core</artifactId>
       <version>1.2.2</version>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
   	  <groupId>com.rabbitmq</groupId>
       <artifactId>amqp-client</artifactId>
   	  <version>4.1.0</version>
 	</dependency>
-	
+
+
+<dependency>
+  <groupId>io.vertx</groupId>
+  <artifactId>vertx-rabbitmq-client</artifactId>
+  <version>3.5.4</version>
+</dependency>
+
+      <dependency>
+          <groupId>io.vertx</groupId>
+          <artifactId>vertx-core</artifactId>
+          <version>3.5.4</version>
+      </dependency>
+
+
 	<!-- https://mvnrepository.com/artifact/com.github.fge/json-schema-validator -->
 	<dependency>
 		<groupId>com.github.fge</groupId>
 		<artifactId>json-schema-validator</artifactId>
 		<version>2.2.6</version>
 	</dependency>
-	
+
 	<!-- https://mvnrepository.com/artifact/com.github.fge/jackson-coreutils -->
 	<dependency>
 		<groupId>com.github.fge</groupId>
 		<artifactId>jackson-coreutils</artifactId>
 		<version>1.8</version>
 	</dependency>
-	
+
 	<!-- https://mvnrepository.com/artifact/com.github.fge/json-schema-core -->
 	<dependency>
 		<groupId>com.github.fge</groupId>
 		<artifactId>json-schema-core</artifactId>
 		<version>1.2.5</version>
 	</dependency>
-	
+
 	<dependency>
       	<groupId>com.googlecode.json-simple</groupId>
       	<artifactId>json-simple</artifactId>
       	<version>1.1.1</version>
       	<scope>compile</scope>
     </dependency>
-	
+
 	<!--  <dependency>
     		<groupId>com.protoTest</groupId>
    	 	<artifactId>protoschema</artifactId>
     		<version>1.0-SNAPSHOT</version>
     		<scope>system</scope>
-    		
+
     		<systemPath>/home/etl_subsystem/protoschema/target/protoschema-1.0-SNAPSHOT-jar-with-dependencies.jar</systemPath>
     </dependency> -->
-    
+
     <dependency>
     		<groupId>com.google.protobuf</groupId>
     		<artifactId>protobuf-java-util</artifactId>
@@ -130,14 +144,14 @@
     		<artifactId>protobuf-java</artifactId>
     		<version>3.5.0</version>
 	</dependency>
-	
+
 	<dependency>
   	  	<groupId>org.eclipse.paho</groupId>
   	  	<artifactId>org.eclipse.paho.client.mqttv3</artifactId>
   	  	<version>1.1.0</version>
 	</dependency>
 	<dependency>
-	
+
     <groupId>org.elasticsearch</groupId>
     <artifactId>elasticsearch</artifactId>
     <version>5.5.3</version>
@@ -148,6 +162,6 @@
     <version>5.5.3</version>
 </dependency>
 
-    
+
   </dependencies>
 </project>
