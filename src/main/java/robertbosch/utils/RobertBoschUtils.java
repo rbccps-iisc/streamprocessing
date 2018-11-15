@@ -82,6 +82,7 @@ import com.aerospike.client.query.RecordSet;
 import com.aerospike.client.task.IndexTask;
 import com.aerospike.client.query.IndexType;
 
+
 import robertbosch.schema.validation.JSONmessagespout;
 import robertbosch.schema.validation.Networkserverspout;
 import robertbosch.schema.validationservice.BatchGeneratorSpout;

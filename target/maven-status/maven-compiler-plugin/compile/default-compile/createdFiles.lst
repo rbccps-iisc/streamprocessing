@@ -12,6 +12,7 @@ robertbosch/schema/validation/ValidationTopology.class
 robertbosch/schema/validation/Networkserverspout.class
 robertbosch/utils/RobertBoschUtils$3.class
 robertbosch/schema/validationservice/BatchGeneratorSpout.class
+robertbosch/schema/validationservice/SchemaValidatorBolt$1.class
 robertbosch/utils/Testclass$1.class
 robertbosch/schema/validationservice/CounterBolt.class
 robertbosch/schema/validationservice/ValidationServiceTopology.class

@@ -79,6 +79,12 @@
           <version>3.5.4</version>
       </dependency>
 
+      <dependency>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+          <version>11.0</version>
+      </dependency>
+
 
 	<!-- https://mvnrepository.com/artifact/com.github.fge/json-schema-validator -->
 	<dependency>
