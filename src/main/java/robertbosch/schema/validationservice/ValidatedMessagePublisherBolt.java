@@ -58,13 +58,21 @@ public class ValidatedMessagePublisherBolt extends BaseRichBolt {
 config.setUri("amqp://xvjvsrrc:VbuL1atClKt7zVNQha0bnnScbNvGiqgb@moose.rmq.cloudamqp.com/xvjvsrrc");
 
 
+if(valid.equals("true")) {
+
 //publish message to broker...TODO:change the queue name
-JsonObject message = new JsonObject().put("body", jsondata);
-client.basicPublish("", "my.queue", message, pubResult -> {
-  if (!pubResult.succeeded()) {
-    pubResult.cause().printStackTrace();
-  }
-});
+	JsonObject message = new JsonObject().put("body", jsondata);
+	client.basicPublish("", "validated.queue", message, pubResult -> {
+		if (!pubResult.succeeded()) {
+			pubResult.cause().printStackTrace();
+		}
+	});
+
+}
+else{
+
+
+}
 
 
 
