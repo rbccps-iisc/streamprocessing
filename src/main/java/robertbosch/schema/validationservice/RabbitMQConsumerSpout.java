@@ -36,31 +36,36 @@ public class RabbitMQConsumerSpout extends BaseRichSpout {
 
 		long start=System.currentTimeMillis();
 		//logic to split the batch into messages and forward it to validator
-		while(true) {
 
-				client.basicGet("my.queue", true, getResult -> {
-					if (getResult.succeeded()) {
-						try {
-						JsonObject msg = getResult.result();
-						String data = msg.getString("body");
-						obj = parser.parse(data);
-						jsonob = (JSONObject) obj;
-						Values vals = new Values(jsonob.get("id"), jsonob.toString());//check if only data needs to be verified
-						spoutcollector.emit(vals);
-						}catch(ParseException p) {
-							p.printStackTrace();
+			//TODO:use basicConsume
+
+			client.start( v-> {
+
+				while(true) {
+					client.basicGet("rawQueue", true, getResult -> {
+						if (getResult.succeeded()) {
+							try {
+								JsonObject msg = getResult.result();
+								String data = msg.getString("body");
+								obj = parser.parse(data);
+								jsonob = (JSONObject) obj;
+								Values vals = new Values(jsonob.get("id"), jsonob.toString());//check if only data needs to be verified
+								spoutcollector.emit(vals);
+							} catch (ParseException p) {
+								p.printStackTrace();
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						} else {
+							getResult.cause().printStackTrace();
 						}
-						catch (Exception e) {
-							e.printStackTrace();
-						}
-					} else {
-						getResult.cause().printStackTrace();
-					}
-				});
+					});
+				}
+			});
 
 
 
-		}
+
 
 		}
 
@@ -74,6 +79,7 @@ public class RabbitMQConsumerSpout extends BaseRichSpout {
 		config = new RabbitMQOptions();
 		vertx = Vertx.vertx();
 		client = RabbitMQClient.create(vertx, config);
+
 	}
 
 	@Override

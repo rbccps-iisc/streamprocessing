@@ -38,7 +38,8 @@ public class ValidatedMessagePublisherBolt extends BaseRichBolt {
 
 	private static final long serialVersionUID = 1L;
 	private OutputCollector outputCollector;
-	String deviceId,jsondata,valid;
+	String deviceId,jsondata;
+	boolean valid;
 	RabbitMQOptions config = null;
 	RabbitMQClient client = null;
 	Vertx vertx = null;
@@ -50,18 +51,18 @@ public class ValidatedMessagePublisherBolt extends BaseRichBolt {
 	public void execute(Tuple arg0) {
 		deviceId = arg0.getStringByField("deviceid");
 		jsondata = arg0.getStringByField("jsondata");
-		valid=arg0.getStringByField("valid");
+		valid = arg0.getBooleanByField("valid");
 
 
-// full amqp uri TODO: set amqp uri
+// full amqp uri TODO: set amqp uri or Hostname
 
 config.setUri("amqp://xvjvsrrc:VbuL1atClKt7zVNQha0bnnScbNvGiqgb@moose.rmq.cloudamqp.com/xvjvsrrc");
 
-
-if(valid.equals("true")) {
+JsonObject message = new JsonObject().put("body", jsondata);
+if(valid) {
 
 //publish message to broker...TODO:change the queue name
-	JsonObject message = new JsonObject().put("body", jsondata);
+
 	client.basicPublish("", "validated.queue", message, pubResult -> {
 		if (!pubResult.succeeded()) {
 			pubResult.cause().printStackTrace();
@@ -71,6 +72,12 @@ if(valid.equals("true")) {
 }
 else{
 
+	//TODO:publish it to user.notification
+	client.basicPublish("", "user.notification", message, pubResult -> {
+		if (!pubResult.succeeded()) {
+			pubResult.cause().printStackTrace();
+		}
+	});
 
 }
 

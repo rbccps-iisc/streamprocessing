@@ -55,11 +55,11 @@ public class SchemaValidatorBolt extends BaseRichBolt {
 		}
 
 		String checked="true";
-		String valid="false";
+		boolean valid=false;
 
 		if(status) {
 			System.out.println("the following data was successfully validated:" + jsondata);
-			valid="true";
+			valid=true;
 		}
 		else
 		{
