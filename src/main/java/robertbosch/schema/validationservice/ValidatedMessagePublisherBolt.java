@@ -3,6 +3,8 @@ package robertbosch.schema.validationservice;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Map;
+
+import com.aerospike.client.Log;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -40,7 +42,7 @@ public class ValidatedMessagePublisherBolt extends BaseRichBolt {
 	private OutputCollector outputCollector;
 	String deviceId,jsondata;
 	boolean valid;
-	RabbitMQOptions config = null;
+	RabbitMQOptions broker_config = null;
 	RabbitMQClient client = null;
 	Vertx vertx = null;
 	// long count;
@@ -56,28 +58,20 @@ public class ValidatedMessagePublisherBolt extends BaseRichBolt {
 
 // full amqp uri TODO: set amqp uri or Hostname
 
-config.setUri("amqp://xvjvsrrc:VbuL1atClKt7zVNQha0bnnScbNvGiqgb@moose.rmq.cloudamqp.com/xvjvsrrc");
+
 
 JsonObject message = new JsonObject().put("body", jsondata);
 if(valid) {
 
 //publish message to broker...TODO:change the queue name
 
-	client.basicPublish("", "validated.queue", message, pubResult -> {
-		if (!pubResult.succeeded()) {
-			pubResult.cause().printStackTrace();
-		}
-	});
+	client.basicPublish("", "validQ", message, null);
 
 }
 else{
 
 	//TODO:publish it to user.notification
-	client.basicPublish("", "user.notification", message, pubResult -> {
-		if (!pubResult.succeeded()) {
-			pubResult.cause().printStackTrace();
-		}
-	});
+	client.basicPublish("", "user.notification", message, null);
 
 }
 
@@ -100,9 +94,28 @@ else{
 	public void prepare(Map arg0, TopologyContext arg1, OutputCollector arg2) {
 		// TODO Auto-generated method stub
 		this.outputCollector = arg2;
-		config = new RabbitMQOptions();
+
+
 		vertx = Vertx.vertx();
-		client = RabbitMQClient.create(vertx, config);
+		broker_config = new RabbitMQOptions();
+		broker_config.setHost("localhost");
+//        broker_config.setPort(broker_port);
+//        broker_config.setVirtualHost(broker_vhost);
+//        broker_config.setUser(username);
+//        broker_config.setPassword(password);
+		broker_config.setConnectionTimeout(6000);
+		broker_config.setRequestedHeartbeat(60);
+		broker_config.setHandshakeTimeout(6000);
+		broker_config.setRequestedChannelMax(5);
+		broker_config.setNetworkRecoveryInterval(500);
+
+		client = RabbitMQClient.create(vertx, broker_config);
+		client.start(start_handler -> {
+			if (start_handler.succeeded()) {
+
+				Log.info("vertx RabbitMQ client started successfully!");
+			}
+		});
 
 //		this.invalidMessageCounter=new HashMap<>();
 	}

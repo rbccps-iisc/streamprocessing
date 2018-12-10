@@ -1,5 +1,6 @@
 package robertbosch.schema.validationservice;
 
+import com.aerospike.client.Log;
 import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -27,7 +28,7 @@ public class RabbitMQConsumerSpout extends BaseRichSpout {
 	JSONParser parser ;
 	JSONObject jsonob;
 	Object obj;
-	RabbitMQOptions config = null;
+	RabbitMQOptions broker_config = null;
 	RabbitMQClient client = null;
 	Vertx vertx = null;
 	@Override
@@ -39,7 +40,7 @@ public class RabbitMQConsumerSpout extends BaseRichSpout {
 
 			//TODO:use basicConsume
 
-			client.start( v-> {
+
 
 				while(true) {
 					client.basicGet("rawQueue", true, getResult -> {
@@ -61,7 +62,6 @@ public class RabbitMQConsumerSpout extends BaseRichSpout {
 						}
 					});
 				}
-			});
 
 
 
@@ -76,9 +76,27 @@ public class RabbitMQConsumerSpout extends BaseRichSpout {
 		spoutcollector = arg2;
 		jsonqueue = new ConcurrentLinkedQueue<byte[]>();
 		parser = new JSONParser();
-		config = new RabbitMQOptions();
 		vertx = Vertx.vertx();
-		client = RabbitMQClient.create(vertx, config);
+
+		broker_config = new RabbitMQOptions();
+		broker_config.setHost("localhost");
+//        broker_config.setPort(broker_port);
+//        broker_config.setVirtualHost(broker_vhost);
+//        broker_config.setUser(username);
+//        broker_config.setPassword(password);
+		broker_config.setConnectionTimeout(6000);
+		broker_config.setRequestedHeartbeat(60);
+		broker_config.setHandshakeTimeout(6000);
+		broker_config.setRequestedChannelMax(5);
+		broker_config.setNetworkRecoveryInterval(500);
+
+		client = RabbitMQClient.create(vertx, broker_config);
+		client.start(start_handler -> {
+			if (start_handler.succeeded()) {
+
+				Log.info("vertx RabbitMQ client started successfully!");
+			}
+		});
 
 	}
 
